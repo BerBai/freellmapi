@@ -69,22 +69,52 @@ WORK_BRANCH=feat/custom-routing UPSTREAM_REMOTE=upstream ./scripts/fork/upstream
 
 ## 自托管实时目录
 
-FreeLLMAPI 已经支持通过环境变量覆盖目录服务，不需要先删除 Premium 页面或绕过服务端鉴权：
+自托管签名目录服务位于 [`fork/catalog`](fork/catalog/README.md)。它使用 Node.js
+内置模块，没有额外运行时依赖。
+
+服务拆分为两个角色：
+
+- 发布端持有 Ed25519 私钥，将目录签名后原子写入 `published.json`
+- 服务端只需要 `published.json`，不需要私钥，并通过 `/v1/latest` 提供签名响应
+
+快速流程：
+
+```bash
+# 1. 生成签名密钥
+node fork/catalog/src/keygen.mjs --out-dir fork/catalog/keys
+
+# 2. 从路由数据库导出目录
+npm run export-catalog -w server -- \
+  --db /path/to/freeapi.db \
+  --out /tmp/catalog.json \
+  --tier live \
+  --version 2026.11.23.1
+
+# 3. 签名并发布
+node fork/catalog/src/publish.mjs \
+  --input /tmp/catalog.json \
+  --private-key fork/catalog/keys/private-key.pem \
+  --out-dir fork/catalog/data
+
+# 4. 启动目录服务
+CATALOG_DATA_DIR=fork/catalog/data node fork/catalog/src/server.mjs
+```
+
+然后配置 FreeLLMAPI：
 
 ```env
-CATALOG_BASE_URL=https://catalog.example.com
+CATALOG_BASE_URL=http://127.0.0.1:8787
 CATALOG_PUBKEY=-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----
 ```
 
-目录服务需要提供：
+服务端点：
 
+- `GET /health`
 - `GET /v1/latest`
-- 可接受可选的 `?since=<version>`，并返回 `304` 表示未变化
-- 响应头 `x-catalog-signature`，值为对响应原始字节进行 Ed25519 签名后的 Base64
-- JSON 内的 `tier` 使用 `live` 或 `monthly`
-- 客户端使用 `CATALOG_PUBKEY` 对应的公钥验证响应
+- `GET /v1/latest?since=<version>`
+- `HEAD /v1/latest`
 
-示例配置见 `.env.fork.example`。私钥只能保存在目录服务端，不能提交到仓库或放进客户端 `.env`。
+目录服务只负责签名和分发，不会自动发现或验证新模型。实际目录内容仍由发布端生成。
 
 注意：仅删除客户端的 Premium 判断不会产生新的模型数据。免费版和实时版的核心差异是目录服务实际返回的内容；要让新模型立即出现，必须自行维护并发布一份实时目录。
 

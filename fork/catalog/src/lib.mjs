@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 export const PUBLISHED_FILE = 'published.json';
+export const PUBLISHER_STATE_FILE = 'publisher-state.json';
 
 export function parseCatalogBody(body, source = 'catalog') {
   let catalog;
@@ -57,11 +58,16 @@ export function parsePublishedManifest(raw, source = 'published catalog') {
   if (manifest.sha256 !== digest) {
     throw new Error(`${source}.sha256 does not match the signed body`);
   }
+  // Recompute from the verified body instead of trusting an unsigned manifest
+  // field. The stored value is informational and can be replaced by a future
+  // canonicalization without trapping scheduled publishers.
+  const contentDigest = semanticCatalogDigest(catalog);
   return {
     ...manifest,
     version: catalog.version,
     tier: catalog.tier,
     generatedAt: catalog.generatedAt,
+    contentDigest,
     catalog,
     digest,
   };
@@ -78,6 +84,34 @@ export function bodyDigest(body) {
 
 export function etagForDigest(digest) {
   return `"sha256-${digest}"`;
+}
+
+function canonicalValue(value) {
+  if (Array.isArray(value)) {
+    return value.map(canonicalValue);
+  }
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, canonicalValue(value[key])]),
+    );
+  }
+  return value;
+}
+
+export function canonicalJson(value) {
+  return JSON.stringify(canonicalValue(value));
+}
+
+/**
+ * Digest the parts of a catalog that affect routing. Version and generatedAt
+ * intentionally do not participate, so a scheduled exporter run with the same
+ * models does not create a new signed release every time.
+ */
+export function semanticCatalogDigest(catalog) {
+  const { version: _version, generatedAt: _generatedAt, ...semantic } = catalog;
+  return crypto.createHash('sha256').update(canonicalJson(semantic), 'utf8').digest('hex');
 }
 
 export function signCatalogBody(body, privateKey) {
@@ -110,9 +144,13 @@ export async function atomicWrite(file, contents, mode = 0o644) {
   }
 }
 
-export async function publishCatalog({ inputFile, privateKeyFile, outputDir }) {
-  const body = await fs.readFile(inputFile, 'utf8');
-  const catalog = parseCatalogBody(body, inputFile);
+export async function publishCatalogBody({
+  body,
+  privateKeyFile,
+  outputDir,
+  contentDigest = semanticCatalogDigest(parseCatalogBody(body)),
+}) {
+  const catalog = parseCatalogBody(body);
   const privateKey = await fs.readFile(privateKeyFile, 'utf8');
   const signature = signCatalogBody(body, privateKey);
   const keyObject = crypto.createPrivateKey(privateKey);
@@ -126,6 +164,7 @@ export async function publishCatalog({ inputFile, privateKeyFile, outputDir }) {
     version: catalog.version,
     tier: catalog.tier,
     generatedAt: catalog.generatedAt,
+    contentDigest,
     sha256: digest,
     signature,
     body,
@@ -133,4 +172,9 @@ export async function publishCatalog({ inputFile, privateKeyFile, outputDir }) {
   const outputFile = path.join(outputDir, PUBLISHED_FILE);
   await atomicWrite(outputFile, `${JSON.stringify(manifest, null, 2)}\n`);
   return { outputFile, manifest, catalog };
+}
+
+export async function publishCatalog({ inputFile, privateKeyFile, outputDir, contentDigest }) {
+  const body = await fs.readFile(inputFile, 'utf8');
+  return publishCatalogBody({ body, privateKeyFile, outputDir, contentDigest });
 }

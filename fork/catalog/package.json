@@ -1,6 +1,6 @@
 {
   "name": "@berbai/freellmapi-catalog",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Self-hosted signed catalog publisher and server for the FreeLLMAPI fork",
@@ -8,7 +8,10 @@
     "start": "node src/server.mjs",
     "keygen": "node src/keygen.mjs",
     "publish": "node src/publish.mjs",
-    "test": "node --test"
+    "test": "node --test",
+    "publisher": "node src/publisher.mjs",
+    "publish-once": "node src/publisher.mjs --once",
+    "validate": "node src/validate-catalog.mjs"
   },
   "engines": {
     "node": ">=20"

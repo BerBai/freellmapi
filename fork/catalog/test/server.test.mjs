@@ -107,6 +107,19 @@ test('HEAD returns metadata without a body', async () => {
   assert.equal(Number(response.headers.get('content-length')), Buffer.byteLength(manifest.body));
 });
 
+test('publisher reports its latest state', async () => {
+  await fs.writeFile(
+    path.join(tempDir, 'publisher-state.json'),
+    JSON.stringify({ status: 'ok', action: 'unchanged', version: manifest.version }),
+  );
+  const response = await fetch(`${baseUrl}/publisher`);
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.status, 'ok');
+  assert.equal(body.action, 'unchanged');
+  assert.equal(body.version, manifest.version);
+});
+
 test('rejects unsupported methods and unknown paths', async () => {
   const post = await fetch(`${baseUrl}/v1/latest`, { method: 'POST' });
   assert.equal(post.status, 405);

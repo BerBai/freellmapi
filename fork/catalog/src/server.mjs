@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
+import fs from 'node:fs/promises';
 import http from 'node:http';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { etagForDigest, loadPublishedManifest, PUBLISHED_FILE } from './lib.mjs';
+import { etagForDigest, loadPublishedManifest, PUBLISHED_FILE, PUBLISHER_STATE_FILE } from './lib.mjs';
 
 const DEFAULT_PORT = 8787;
 const DEFAULT_HOST = '127.0.0.1';
@@ -84,7 +85,27 @@ export function createCatalogServer({
         service: 'freellmapi-catalog',
         endpoint: '/v1/latest',
         health: '/health',
+        publisher: '/publisher',
       });
+      return;
+    }
+
+    if (requestUrl.pathname === '/publisher') {
+      if (!isRead) {
+        methodNotAllowed(res, 'GET, HEAD');
+        return;
+      }
+      const stateFile = path.join(path.dirname(dataFile), PUBLISHER_STATE_FILE);
+      try {
+        const state = JSON.parse(await fs.readFile(stateFile, 'utf8'));
+        sendJson(res, 200, state);
+      } catch (error) {
+        if (error?.code === 'ENOENT') {
+          sendJson(res, 404, { status: 'never_run' });
+          return;
+        }
+        sendJson(res, 500, { status: 'error', error: 'publisher_state_unreadable' });
+      }
       return;
     }
 

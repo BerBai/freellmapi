@@ -90,13 +90,19 @@ npm run export-catalog -w server -- \
   --tier live \
   --version 2026.11.23.1
 
-# 3. 签名并发布
+# 3. 手动签名发布（一次性）
 node fork/catalog/src/publish.mjs \
   --input /tmp/catalog.json \
   --private-key fork/catalog/keys/private-key.pem \
   --out-dir fork/catalog/data
 
-# 4. 启动目录服务
+# 4. 或启动自动发布器（单次；自动发布时跳过第 3 步）
+node fork/catalog/src/publisher.mjs \
+  --private-key fork/catalog/keys/private-key.pem \
+  --out-dir fork/catalog/data \
+  --once
+
+# 5. 启动目录服务
 CATALOG_DATA_DIR=fork/catalog/data node fork/catalog/src/server.mjs
 ```
 
@@ -110,11 +116,17 @@ CATALOG_PUBKEY=-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----
 服务端点：
 
 - `GET /health`
+- `GET /publisher`
 - `GET /v1/latest`
 - `GET /v1/latest?since=<version>`
 - `HEAD /v1/latest`
 
+自动发布器会比较目录的语义内容：只有模型、限额、排序或 quirk 发生变化时才生成新版本；仅修改
+`version` 或 `generatedAt` 不会产生新发布。默认还会阻止模型数量下降超过 50% 的异常目录，
+发布状态可通过 `GET /publisher` 查看。
+
 目录服务只负责签名和分发，不会自动发现或验证新模型。实际目录内容仍由发布端生成。
+`PUBLISHER_PREPARE_COMMAND` 是接入自定义模型发现和探测流程的位置。
 
 注意：仅删除客户端的 Premium 判断不会产生新的模型数据。免费版和实时版的核心差异是目录服务实际返回的内容；要让新模型立即出现，必须自行维护并发布一份实时目录。
 

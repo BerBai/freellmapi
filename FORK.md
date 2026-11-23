@@ -12,32 +12,57 @@
 
 ## 同步上游
 
+推荐使用仓库内脚本，脚本会在改写历史前检查工作区是否干净。
+
 ```bash
-git fetch upstream --prune
+# 查看当前分支与上游的差距
+./scripts/fork/upstream-sync.sh status
 
-# 更新纯上游镜像
-git switch main
-git merge --ff-only upstream/main
-git push origin main
+# 列出尚未进入当前工作分支的上游提交
+./scripts/fork/upstream-sync.sh list
 
-# 将自定义分支变基到最新上游
-git switch feat/self-hosted-catalog
-git rebase upstream/main
+# 更新 main，并变基当前自定义分支
+./scripts/fork/upstream-sync.sh sync
 
-# 变基后推送自己的分支
-git push --force-with-lease origin feat/self-hosted-catalog
+# 同时把 main 和自定义分支推送到 Fork
+./scripts/fork/upstream-sync.sh sync --push
 ```
 
-如果该分支已经有多人协作，改用 `git merge upstream/main`，不要强制改写公共历史。
+也可以单独执行：
+
+```bash
+# 只更新 main
+./scripts/fork/upstream-sync.sh update-main --push
+
+# 只将自定义分支变基到最新 upstream/main
+./scripts/fork/upstream-sync.sh rebase --push
+```
+
+脚本默认配置：
+
+- `upstream` 指向 `tashfeenahmed/freellmapi`
+- `origin` 指向自己的 Fork
+- 工作分支为 `feat/self-hosted-catalog`
+
+可使用环境变量覆盖：
+
+```bash
+WORK_BRANCH=feat/custom-routing UPSTREAM_REMOTE=upstream ./scripts/fork/upstream-sync.sh rebase --push
+```
+
+脚本永远不会向 `upstream` 推送。如果该分支已经有多人协作，改用 `git merge upstream/main`，不要强制改写公共历史。
 
 ## 只迁移指定的上游提交
 
 ```bash
-git fetch upstream --prune
-git log --oneline HEAD..upstream/main
+# 先确认可用提交
+./scripts/fork/upstream-sync.sh list 100
 
-# 挑选需要的提交
-git cherry-pick <commit-sha>
+# 将指定提交应用到当前工作分支
+./scripts/fork/upstream-sync.sh cherry-pick <commit-sha>
+
+# 应用后推送
+./scripts/fork/upstream-sync.sh cherry-pick <commit-sha> --push
 ```
 
 合并前可用 `git range-diff` 对比变基前后的补丁序列，确认没有意外丢失自定义修改。

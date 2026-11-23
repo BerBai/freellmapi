@@ -96,7 +96,9 @@ node fork/catalog/src/publish.mjs \
   --private-key fork/catalog/keys/private-key.pem \
   --out-dir fork/catalog/data
 
-# 4. 或启动自动发布器（单次；自动发布时跳过第 3 步）
+# 4. 自动发现、探测并发布（单次）
+PUBLISHER_PREPARE_COMMAND='./fork/catalog/scripts/prepare-from-db.sh' \
+PUBLISHER_VALIDATE_COMMAND='node fork/catalog/src/validate-catalog.mjs' \
 node fork/catalog/src/publisher.mjs \
   --private-key fork/catalog/keys/private-key.pem \
   --out-dir fork/catalog/data \

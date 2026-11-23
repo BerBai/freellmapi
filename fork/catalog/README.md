@@ -89,10 +89,12 @@ Useful environment variables:
 | `PUBLISHER_MIN_MODELS` | Refuse catalogs below this count, default `1` |
 | `PUBLISHER_MAX_MODEL_DROP_PERCENT` | Refuse larger model-count drops, default `50` |
 
-Example with a model preparation and validation hook:
+### Built-in prepare command
+
+`fork/catalog/scripts/prepare-from-db.sh` is the real preparation pipeline:
 
 ```bash
-PUBLISHER_PREPARE_COMMAND='./scripts/your-model-refresh.sh' \
+PUBLISHER_PREPARE_COMMAND='./fork/catalog/scripts/prepare-from-db.sh' \
 PUBLISHER_VALIDATE_COMMAND='node fork/catalog/src/validate-catalog.mjs' \
 node fork/catalog/src/publisher.mjs \
   --private-key fork/catalog/keys/private-key.pem \
@@ -100,9 +102,45 @@ node fork/catalog/src/publisher.mjs \
   --once
 ```
 
-The `prepare` hook is where you connect your own discovery/probe pipeline. The
-publisher does not invent model facts and does not silently publish an empty or
-suddenly mass-deleted catalog.
+It performs three stages:
+
+1. **Discovery** — calls `/models` on keyed OpenAI-compatible providers and
+   registers new chat models through the upstream `registerDiscoveredModels`
+   path. The default scope is `existing`: only providers already represented in
+   the local model database are refreshed. Use `all`, `none`, or an explicit
+   comma-separated platform list when needed.
+2. **Custom endpoint sync** — reuses the upstream custom-model sync for every
+   configured OpenAI-compatible custom endpoint.
+3. **Availability probes** — probes up to `PREPARE_PROBE_LIMIT` stale or new
+   routable model+key pairs and records `working`, `unavailable`, or `error` in
+   `model_probe_status`.
+
+Safety rules:
+
+- Never deletes catalog, user or declarative models.
+- Never disables catalog, user or declarative models.
+- Only auto-discovered rows can be disabled, and only on a clear permanent
+  model rejection such as 403/404 or “model not found”.
+- Rate limits, quota exhaustion, 5xx, timeouts and transport errors are treated
+  as inconclusive, not permanent.
+- Discovery failures do not abort publication unless `PREPARE_STRICT=1`.
+
+Prepare environment variables:
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `PREPARE_DISCOVERY_PLATFORMS` | `existing` | `existing`, `all`, `none`, or platform ids |
+| `PREPARE_SYNC_CUSTOM` | `1` | Sync configured custom endpoints |
+| `PREPARE_PROBE_LIMIT` | `20` | Maximum model probes per preparation run |
+| `PREPARE_DISABLE_INVALID_DISCOVERED` | `1` | Disable permanently rejected discovered models |
+| `PREPARE_STRICT` | `0` | Fail the prepare command when any discovery platform fails |
+
+The standard `CUSTOM_MODEL_SYNC_FREE_PATTERNS` filter also applies to automatic
+discovery, which is useful when a provider's `/models` endpoint includes paid
+models without price metadata.
+
+The publisher does not invent model facts and does not silently publish an
+empty or suddenly mass-deleted catalog.
 
 ## 5. Run the catalog server
 

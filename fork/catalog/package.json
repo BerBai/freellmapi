@@ -11,7 +11,8 @@
     "test": "node --test",
     "publisher": "node src/publisher.mjs",
     "publish-once": "node src/publisher.mjs --once",
-    "validate": "node src/validate-catalog.mjs"
+    "validate": "node src/validate-catalog.mjs",
+    "prepare-models": "bash scripts/prepare-from-db.sh"
   },
   "engines": {
     "node": ">=20"

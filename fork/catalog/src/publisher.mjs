@@ -66,7 +66,7 @@ Environment:
   PUBLISHER_EXPORT_COMMAND     Command whose stdout is the catalog JSON.
                                Default: npm run export-catalog -w server -- --stdout --tier live
   PUBLISHER_PREPARE_COMMAND    Optional command run before export.
-                               Use this for model discovery/probing.
+                               Built-in: ./fork/catalog/scripts/prepare-from-db.sh
   PUBLISHER_VALIDATE_COMMAND   Optional command run after export. CATALOG_FILE
                                points at the generated catalog.
   PUBLISHER_DB_PATH            Convenience for the default exporter --db argument.

@@ -20,7 +20,7 @@
 Any client that can target an OpenAI-compatible base URL can use FreeLLMAPI:
 
 - **LangChain, LlamaIndex, official OpenAI SDKs**: set `base_url` to
-  `http://localhost:3001/v1` and use the unified key from the dashboard.
+  `http://localhost:4301/v1` and use the unified key from the dashboard.
 - **Local GPU boxes**: add custom OpenAI-compatible endpoints for Ollama,
   llama.cpp, LM Studio, vLLM, or an internal gateway.
 
@@ -32,7 +32,7 @@ the Anthropic Messages API, so the base URL is the **bare origin, without
 
 1. In Claude Desktop, open **Setup** and choose **Gateway**.
 2. Set the **Gateway base URL** to `http://127.0.0.1:31415` for the desktop app,
-   or `http://localhost:3001` for a server install.
+   or `http://localhost:4301` for a server install.
    - In the desktop app, the tray panel's **Copy Claude URL** button copies this.
    - On the dashboard it is the **Claude base URL** on the Keys page's **Anthropic** tab.
 3. Use the unified key from the dashboard as the API key (`x-api-key`).
@@ -49,7 +49,7 @@ anyway, but older builds answer 404 with "Gateway /v1/models returned HTTP 404".
 Install the agent itself first: FreeLLMAPI does not bundle it. For Claude Code, see
 [the Claude Code setup guide](https://docs.claude.com/en/docs/claude-code/setup), then check
 that `claude --version` works in a new terminal. The desktop app listens on
-`http://127.0.0.1:31415`, so use that in place of `http://localhost:3001` below.
+`http://127.0.0.1:31415`, so use that in place of `http://localhost:4301` below.
 
 On Windows (PowerShell), with the unified key from the dashboard:
 
@@ -70,9 +70,9 @@ Use the generator instead of hand-editing a client configuration:
 
 ```bash
 export FREELLMAPI_API_KEY=<unified-key>   # or pass --api-key on each command
-npx freellmapi setup-claude --url http://localhost:3001 --dry-run
-npx freellmapi setup-claude --url http://localhost:3001
-npx freellmapi setup-dsh --url http://localhost:3001 --api-key <unified-key>
+npx llmself setup-claude --url http://localhost:4301 --dry-run
+npx llmself setup-claude --url http://localhost:4301
+npx llmself setup-dsh --url http://localhost:4301 --api-key <unified-key>
 ```
 
 `--dry-run` prints a diff. Real writes merge with the existing configuration
@@ -82,28 +82,28 @@ context windows.
 
 | Agent | Automated command | Manual base URL | Wire |
 | --- | --- | --- | --- |
-| **Claude Code** | `setup-claude` or credential-free-on-disk `launch` | `http://localhost:3001` | Anthropic Messages |
-| **Codex CLI** | `setup-codex` or `launch-codex` | `http://localhost:3001/v1` | Responses (`wire_api = "responses"`) |
-| **Cline** | `setup-cline` | `http://localhost:3001/v1` | OpenAI Chat |
-| **Continue** | `setup-continue` | `http://localhost:3001/v1` | OpenAI Chat / legacy Completions |
-| **Aider** | `setup-aider` | `http://localhost:3001/v1` | OpenAI Chat |
-| **OpenCode** | `setup-opencode` | `http://localhost:3001/v1` | OpenAI Chat |
-| **Goose** | `setup-goose` | `http://localhost:3001/v1` | OpenAI Chat |
-| **Qwen Code** | `setup-qwen` | `http://localhost:3001/v1` | OpenAI Chat (native Gemini also works) |
-| **Roo Code** | `setup-roo` | `http://localhost:3001/v1` | OpenAI Chat |
-| **Kilo Code** | `setup-kilo` | `http://localhost:3001/v1` | OpenAI Chat |
-| **Crush** | `setup-crush` | `http://localhost:3001/v1` | OpenAI Chat |
-| **DeepSeek Harness** | `setup-dsh` | `http://localhost:3001/v1` | OpenAI Chat (`api: openai-completions`) |
-| **MiMo Code** | `setup-mimo` | `http://localhost:3001/v1` | OpenAI Chat |
-| **AtomCode** | `setup-atomcode` | `http://localhost:3001/v1` | OpenAI Chat (`type = "openai"`) |
-| **OpenClaw** | `setup-openclaw` | `http://localhost:3001/v1` | OpenAI Chat (`api: openai-completions`) |
-| **Hermes Agent** | `setup-hermes` | `http://localhost:3001/v1` | OpenAI Chat (`provider: custom`) |
-| **Pi** | `setup-pi` | `http://localhost:3001/v1` | OpenAI Chat (`api: openai-completions`) |
-| **Reasonix** | `setup-reasonix` | `http://localhost:3001/v1` | OpenAI Chat (`kind = "openai"`) |
-| **ZCode** | `setup-zcode` | `http://localhost:3001/v1` | OpenAI Chat (`openai-chat-completions`) |
-| **QwenPaw** | Manual setup | `http://localhost:3001/v1` | OpenAI Chat (`chat.completions`) |
+| **Claude Code** | `setup-claude` or credential-free-on-disk `launch` | `http://localhost:4301` | Anthropic Messages |
+| **Codex CLI** | `setup-codex` or `launch-codex` | `http://localhost:4301/v1` | Responses (`wire_api = "responses"`) |
+| **Cline** | `setup-cline` | `http://localhost:4301/v1` | OpenAI Chat |
+| **Continue** | `setup-continue` | `http://localhost:4301/v1` | OpenAI Chat / legacy Completions |
+| **Aider** | `setup-aider` | `http://localhost:4301/v1` | OpenAI Chat |
+| **OpenCode** | `setup-opencode` | `http://localhost:4301/v1` | OpenAI Chat |
+| **Goose** | `setup-goose` | `http://localhost:4301/v1` | OpenAI Chat |
+| **Qwen Code** | `setup-qwen` | `http://localhost:4301/v1` | OpenAI Chat (native Gemini also works) |
+| **Roo Code** | `setup-roo` | `http://localhost:4301/v1` | OpenAI Chat |
+| **Kilo Code** | `setup-kilo` | `http://localhost:4301/v1` | OpenAI Chat |
+| **Crush** | `setup-crush` | `http://localhost:4301/v1` | OpenAI Chat |
+| **DeepSeek Harness** | `setup-dsh` | `http://localhost:4301/v1` | OpenAI Chat (`api: openai-completions`) |
+| **MiMo Code** | `setup-mimo` | `http://localhost:4301/v1` | OpenAI Chat |
+| **AtomCode** | `setup-atomcode` | `http://localhost:4301/v1` | OpenAI Chat (`type = "openai"`) |
+| **OpenClaw** | `setup-openclaw` | `http://localhost:4301/v1` | OpenAI Chat (`api: openai-completions`) |
+| **Hermes Agent** | `setup-hermes` | `http://localhost:4301/v1` | OpenAI Chat (`provider: custom`) |
+| **Pi** | `setup-pi` | `http://localhost:4301/v1` | OpenAI Chat (`api: openai-completions`) |
+| **Reasonix** | `setup-reasonix` | `http://localhost:4301/v1` | OpenAI Chat (`kind = "openai"`) |
+| **ZCode** | `setup-zcode` | `http://localhost:4301/v1` | OpenAI Chat (`openai-chat-completions`) |
+| **QwenPaw** | Manual setup | `http://localhost:4301/v1` | OpenAI Chat (`chat.completions`) |
 | **Cursor** | `setup-cursor` prints the guide | public `https://…/v1` | OpenAI Chat |
-| **Anything else** | `setup-generic` prints a ready block | `http://localhost:3001/v1` | OpenAI Chat |
+| **Anything else** | `setup-generic` prints a ready block | `http://localhost:4301/v1` | OpenAI Chat |
 
 The root-vs-`/v1` distinction matters: Claude Code expects the server root
 because it appends the Anthropic Messages path. OpenAI-compatible clients in
@@ -119,7 +119,7 @@ window, image support), point the provider's `model_catalog_url` at
 ```toml
 [model_providers.freellmapi]
 # ...existing base_url, env_key and wire_api...
-model_catalog_url = "http://localhost:3001/v1/codex/models"
+model_catalog_url = "http://localhost:4301/v1/codex/models"
 ```
 
 The catalog keeps Codex's own default system prompt and tool settings, so
@@ -139,7 +139,7 @@ own, so nothing needs exporting. Both writes are structural merges: other
 routes, comments, and settings in the file are left as they were.
 
 ```bash
-npx freellmapi setup-dsh --url http://localhost:3001 --api-key <unified-key>
+npx llmself setup-dsh --url http://localhost:4301 --api-key <unified-key>
 npx @deepseek-ai/dsh web
 ```
 
@@ -166,7 +166,7 @@ generated file is the weakest layer and anything you hand-write in
 providers and settings already in `config.json` are left as they were.
 
 ```bash
-npx freellmapi setup-mimo --url http://localhost:3001
+npx llmself setup-mimo --url http://localhost:4301
 export FREELLMAPI_API_KEY=<unified-key>
 mimo
 ```
@@ -192,7 +192,7 @@ tables, the two generated tables are replaced, and unrelated accounts,
 models, legacy providers and settings are preserved.
 
 ```bash
-npx freellmapi setup-atomcode --url http://localhost:3001 --api-key <unified-key>
+npx llmself setup-atomcode --url http://localhost:4301 --api-key <unified-key>
 atomcode
 ```
 
@@ -219,7 +219,7 @@ providers, `fallbacks` on the default model, and every other setting in the
 file are left as they were.
 
 ```bash
-npx freellmapi setup-openclaw --url http://localhost:3001 --api-key <unified-key>
+npx llmself setup-openclaw --url http://localhost:4301 --api-key <unified-key>
 npm install -g openclaw@latest --allow-scripts=openclaw
 openclaw agent exec --model freellmapi/auto "Say hello"   # no gateway daemon needed
 ```
@@ -252,7 +252,7 @@ exactly what `hermes setup` would do, and it is what lets a headless first
 run skip the wizard. Every other key in the file is left as it was.
 
 ```bash
-npx freellmapi setup-hermes --url http://localhost:3001 --api-key <unified-key>
+npx llmself setup-hermes --url http://localhost:4301 --api-key <unified-key>
 curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash -s -- --skip-setup
 hermes -z "Say hello"
 ```
@@ -279,7 +279,7 @@ created with mode 0600. Other providers and settings in both files are left
 as they were.
 
 ```bash
-npx freellmapi setup-pi --url http://localhost:3001 --api-key <unified-key>
+npx llmself setup-pi --url http://localhost:4301 --api-key <unified-key>
 npm install -g @earendil-works/pi-coding-agent
 pi -p "Say hello"
 ```
@@ -309,7 +309,7 @@ at `freellmapi/<model>`. The entry names its key with
 replaces only the `freellmapi` entry.
 
 ```bash
-npx freellmapi setup-reasonix --url http://localhost:3001 --api-key <unified-key>
+npx llmself setup-reasonix --url http://localhost:4301 --api-key <unified-key>
 npm install -g reasonix
 reasonix -p "Say hello"
 ```
@@ -338,7 +338,7 @@ providers, so the key lives in that file; the writer backs the file up first
 and keeps it at `0600`.
 
 ```bash
-npx freellmapi setup-zcode --url http://localhost:3001 --api-key <unified-key>
+npx llmself setup-zcode --url http://localhost:4301 --api-key <unified-key>
 ```
 
 Quit ZCode Desktop before running it so the app does not save its in-memory
@@ -362,10 +362,10 @@ Console:
    as `FreeLLMAPI`, and set the API compatibility mode to OpenAI
    `chat.completions`.
 3. Open the new provider's settings and set **Base URL** to
-   `http://localhost:3001/v1` and **API Key** to your FreeLLMAPI unified key.
+   `http://localhost:4301/v1` and **API Key** to your FreeLLMAPI unified key.
 4. On the provider's models page, add a model. Use `auto` as the **Model ID**
    to let FreeLLMAPI route the request, or copy a current id from
-   `GET http://localhost:3001/v1/models`.
+   `GET http://localhost:4301/v1/models`.
 5. Save, then pick the model as the default (or per chat) and send a test
    message.
 
@@ -381,7 +381,7 @@ for the current Console field names.
 Gemini CLI and Gemini-lineage clients can speak Google's wire format directly:
 
 ```bash
-export GOOGLE_GEMINI_BASE_URL=http://localhost:3001
+export GOOGLE_GEMINI_BASE_URL=http://localhost:4301
 export GEMINI_API_KEY=freellmapi-your-unified-key
 gemini
 ```
@@ -410,7 +410,7 @@ Ollama emulation is off by default. Enable one of these modes on
 The exact endpoints are `/api/tags`, `/api/chat`, `/api/generate`, `/api/show`,
 `/api/version`, `/api/embed`, and legacy `/api/embeddings`. Streaming uses
 newline-delimited JSON, not SSE. Point Zed, JetBrains AI Assistant, or another
-Ollama-capable client at `http://localhost:3001`.
+Ollama-capable client at `http://localhost:4301`.
 
 ## Headerless clients
 
@@ -418,9 +418,9 @@ If a client cannot set headers, create a separately revocable token on
 **Keys → Agents** and use:
 
 ```text
-http://localhost:3001/v1/t/<token>/chat/completions
-http://localhost:3001/v1/t/<token>/responses
-http://localhost:3001/v1/t/<token>/models
+http://localhost:4301/v1/t/<token>/chat/completions
+http://localhost:4301/v1/t/<token>/responses
+http://localhost:4301/v1/t/<token>/models
 ```
 
 The same prefix exposes `/api/chat` and `/api/tags`. Never put the unified API
@@ -441,7 +441,7 @@ keep it on, so an existing Claude Code or Cline session does not break on upgrad
 it on the Keys page under **Agent compatibility**, or from the API:
 
 ```bash
-curl -X PUT http://localhost:3001/api/settings/enable-mcp \
+curl -X PUT http://localhost:4301/api/settings/enable-mcp \
   -H "Authorization: Bearer <dashboard-token>" -H "Content-Type: application/json" \
   -d '{"enabled": true}'
 ```
@@ -451,7 +451,7 @@ While it is off, every verb on `/mcp` answers `403` with a JSON-RPC error saying
 For Claude Code:
 
 ```bash
-claude mcp add --transport http freellmapi http://localhost:3001/mcp \
+claude mcp add --transport http freellmapi http://localhost:4301/mcp \
   --header "Authorization: Bearer freellmapi-your-unified-key"
 ```
 
@@ -470,7 +470,7 @@ The three relevant settings are deliberately separate:
 
 | Setting | Where it lives | Example |
 | --- | --- | --- |
-| Base URL | `mcp.server_urls[].url` in tunnel-client | `http://127.0.0.1:3001/mcp` |
+| Base URL | `mcp.server_urls[].url` in tunnel-client | `http://127.0.0.1:4301/mcp` |
 | API key | `FREELLMAPI_MCP_AUTHORIZATION` environment variable | `Bearer freellmapi-...` |
 | Default model | FreeLLMAPI `MCP_INFERENCE_DEFAULT_MODEL` | `auto`, a model id, or `auto:<profile>` |
 
@@ -524,7 +524,7 @@ models:
   - name: FreeLLMAPI Autocomplete
     provider: openai
     model: auto
-    apiBase: http://localhost:3001/v1
+    apiBase: http://localhost:4301/v1
     apiKey: freellmapi-your-unified-key
     useLegacyCompletionsEndpoint: true
     roles:

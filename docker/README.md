@@ -1,6 +1,6 @@
 # Docker Guide
 
-Docker Compose is the recommended way to run FreeLLMAPI for personal use. The container serves the Express API and the built React dashboard from one process on port 3001, with SQLite persisted in a named volume.
+Docker Compose is the recommended way to run FreeLLMAPI for personal use. The container serves the Express API and the built React dashboard from one process on port 4301, with SQLite persisted in a named volume.
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ Create a `.env` file with a 32-byte encryption key:
 
 ```bash
 ENCRYPTION_KEY="$(openssl rand -hex 32)"
-printf "ENCRYPTION_KEY=%s\nPORT=3001\n" "$ENCRYPTION_KEY" > .env
+printf "ENCRYPTION_KEY=%s\nPORT=4301\n" "$ENCRYPTION_KEY" > .env
 ```
 
 Start the app:
@@ -23,12 +23,12 @@ Start the app:
 docker compose up -d
 ```
 
-Open http://localhost:3001, add provider keys on the **Keys** page, then use the generated `freellmapi-...` key with any OpenAI-compatible client.
+Open http://localhost:4301, add provider keys on the **Keys** page, then use the generated `freellmapi-...` key with any OpenAI-compatible client.
 
 ## Example API Call
 
 ```bash
-curl http://localhost:3001/v1/chat/completions \
+curl http://localhost:4301/v1/chat/completions \
   -H "Authorization: Bearer freellmapi-your-unified-key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -75,7 +75,7 @@ docker compose up -d --build
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
 | `ENCRYPTION_KEY` | Yes | None | 64-character hex key used to encrypt provider API keys at rest. Generate it once and keep it stable. |
-| `PORT` | No | `3001` | Host port exposed by Docker Compose. The container listens on port 3001. |
+| `PORT` | No | `4301` | Host port exposed by Docker Compose. The container listens on port 4301. |
 | `FREEAPI_DB_PATH` | No | `/app/server/data/freellmapi.db` | SQLite file path. Set this when your host only persists one mounted directory. |
 | `FREEAPI_DB_BACKUP_PATH` | No | None | Local encrypted backup file. Restored on startup if the DB file is missing, then refreshed while the app runs. |
 | `FREEAPI_DB_BACKUP_URL` | No | None | HTTP(S) encrypted backup target. Startup uses `GET`; periodic backups use `PUT`. |

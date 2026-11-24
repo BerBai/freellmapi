@@ -128,7 +128,7 @@
 Большинство агентов можно настроить одной командой. Она читает актуальный каталог, сохраняет резервную копию текущих настроек и объединяет их с новыми:
 
 ```bash
-npx freellmapi setup-claude --url http://localhost:3001 --api-key <unified-key>
+npx freellmapi setup-claude --url http://localhost:4301 --api-key <unified-key>
 ```
 
 **[Все поддерживаемые агенты и команды настройки →](docs/en/clients/02-supported-agents.md)** · [Инструкции для инструментов, MCP-сервер и URL-токены →](docs/en/clients/01-agent-clients.md)
@@ -173,7 +173,7 @@ curl -fsSL https://freellmapi.co/install.sh | bash
 
 Не хотите выполнять удалённый скрипт без предварительного просмотра? [Посмотрите его исходный код](https://freellmapi.co/install.sh). Повторный запуск безопасен: существующие `.env` и ключ шифрования сохраняются, а контейнер обновляется до `:latest`.
 
-Откройте http://localhost:3001, добавьте ключи провайдеров на странице **Keys**, настройте порядок **Fallback Chain** и скопируйте единый API-ключ из заголовка страницы **Keys**. Именно его следует указывать в OpenAI SDK.
+Откройте http://localhost:4301, добавьте ключи провайдеров на странице **Keys**, настройте порядок **Fallback Chain** и скопируйте единый API-ключ из заголовка страницы **Keys**. Именно его следует указывать в OpenAI SDK.
 
 Для Windows проще всего установить приложение из **[Microsoft Store](https://apps.microsoft.com/detail/9PBN6G8K2B7F)**: оно подписано (Smart App Control его не блокирует) и обновляется автоматически. Неподписанный установщик `.exe` доступен в [Releases](https://github.com/tashfeenahmed/freellmapi/releases/latest). Для Android существует экспериментальное [руководство по Termux](docs/en/install/02-android-termux.md).
 
@@ -191,7 +191,7 @@ curl -fsSL https://freellmapi.co/install.sh | bash
 
 ## OpenAI-совместимые клиенты
 
-Поддерживается любой клиент, которому можно задать OpenAI-совместимый базовый URL: укажите `http://localhost:3001/v1` и единый ключ с панели управления. Все генераторы конфигураций поддерживают `--dry-run`. Команды `npx freellmapi launch` (Claude Code) и `launch-codex` (Codex) позволяют не сохранять учётные данные в конфигурационных файлах. Маршрутизатор также работает как MCP-сервер, который агенты могут опрашивать во время сессии.
+Поддерживается любой клиент, которому можно задать OpenAI-совместимый базовый URL: укажите `http://localhost:4301/v1` и единый ключ с панели управления. Все генераторы конфигураций поддерживают `--dry-run`. Команды `npx freellmapi launch` (Claude Code) и `launch-codex` (Codex) позволяют не сохранять учётные данные в конфигурационных файлах. Маршрутизатор также работает как MCP-сервер, который агенты могут опрашивать во время сессии.
 
 **ChatGPT** подключается к тому же локальному маршрутизатору через приватный Secure MCP Tunnel. MCP-инструмент `ask_freellmapi` отправляет задачу ChatGPT через `/v1/chat/completions` и возвращает ответ с метаданными обслужившей модели, резервной маршрутизации, кеша, выполнения и токенов. Базовый URL и Bearer-аутентификация задаются в настройках клиента туннеля. Модель по умолчанию настраивается через `MCP_INFERENCE_DEFAULT_MODEL` (при отсутствии значения используется `auto`). Нельзя размещать ключ в Git или URL MCP. **[Настройка ChatGPT →](docs/en/clients/01-agent-clients.md#chatgpt-private-secure-mcp-tunnel)**
 
@@ -234,7 +234,7 @@ Premium поддерживает оперативный каталог на вс
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="http://localhost:3001/v1",
+    base_url="http://localhost:4301/v1",
     api_key="freellmapi-your-unified-key",
 )
 
@@ -306,7 +306,7 @@ print("Routed via:", resp.headers.get("x-routed-via"))
 - **Улучшить панель управления**: графики аналитики, интерфейс ротации ключей, массовый импорт из `.env`.
 - **Улучшить документацию**: примеры, фрагменты кода для Go/Rust и других языков, инструкции для Docker или Fly.
 
-Команда `npm install && npm run dev` запускает сервер на порту :3001 и панель на :5173 с горячей перезагрузкой. Для воспроизводимой настройки используйте `./scripts/dev-bootstrap.sh` в Bash или `.\scripts\dev-bootstrap.ps1` в PowerShell. Оба скрипта сохраняют существующий `.env`. Для PR нужны тесты, успешный запуск имеющегося набора (`npm test`) и соблюдение существующих `.editorconfig` / tsconfig. Работа с миграциями БД и полный процесс участия описаны в [CONTRIBUTING.md](./CONTRIBUTING.md).
+Команда `npm install && npm run dev` запускает сервер на порту :4301 и панель на :5173 с горячей перезагрузкой. Для воспроизводимой настройки используйте `./scripts/dev-bootstrap.sh` в Bash или `.\scripts\dev-bootstrap.ps1` в PowerShell. Оба скрипта сохраняют существующий `.env`. Для PR нужны тесты, успешный запуск имеющегося набора (`npm test`) и соблюдение существующих `.editorconfig` / tsconfig. Работа с миграциями БД и полный процесс участия описаны в [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ### Участники
 

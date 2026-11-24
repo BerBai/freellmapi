@@ -13,7 +13,7 @@ describe('env drift warnings', () => {
   it('parses active env assignments and can include commented examples', () => {
     const text = [
       'ENCRYPTION_KEY=abc',
-      'export PORT=3001',
+      'export PORT=4301',
       '# DASHBOARD_ORIGINS=http://localhost:5173',
       '# just a comment',
       'lowercase=value',
@@ -29,10 +29,10 @@ describe('env drift warnings', () => {
 
   it('warns about missing active defaults without flagging opt-in examples', () => {
     const report = compareEnvText(
-      'ENCRYPTION_KEY=abc\nPORT=3001\n',
+      'ENCRYPTION_KEY=abc\nPORT=4301\n',
       [
         'ENCRYPTION_KEY=your-key',
-        'PORT=3001',
+        'PORT=4301',
         'REQUEST_ANALYTICS_RETENTION_DAYS=90',
         '# FREELLMAPI_CONTEXT_HANDOFF=on_model_switch',
       ].join('\n'),
@@ -46,12 +46,12 @@ describe('env drift warnings', () => {
     const report = compareEnvText(
       [
         'ENCRYPTION_KEY=abc',
-        'PORT=3001',
+        'PORT=4301',
         'OLD_FLAG=true',
         'NODE_ENV=production',
         'PROVIDER_DAILY_REQUEST_CAP_GROQ=50',
       ].join('\n'),
-      'ENCRYPTION_KEY=your-key\nPORT=3001\n# HOST=::\n',
+      'ENCRYPTION_KEY=your-key\nPORT=4301\n# HOST=::\n',
     );
 
     expect(report.missingDocumentedDefaults).toEqual([]);
@@ -76,8 +76,8 @@ describe('env drift warnings', () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'freellmapi-env-drift-'));
     const envPath = path.join(dir, '.env');
     const examplePath = path.join(dir, '.env.example');
-    fs.writeFileSync(envPath, 'ENCRYPTION_KEY=abc\nPORT=3001\nOLD_FLAG=true\n');
-    fs.writeFileSync(examplePath, 'ENCRYPTION_KEY=your-key\nPORT=3001\nREQUEST_ANALYTICS_MAX_ROWS=100000\n');
+    fs.writeFileSync(envPath, 'ENCRYPTION_KEY=abc\nPORT=4301\nOLD_FLAG=true\n');
+    fs.writeFileSync(examplePath, 'ENCRYPTION_KEY=your-key\nPORT=4301\nREQUEST_ANALYTICS_MAX_ROWS=100000\n');
     const logger = { warn: vi.fn() };
 
     const report = warnOnEnvDrift({ envPath, examplePath }, logger);

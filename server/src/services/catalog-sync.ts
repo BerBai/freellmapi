@@ -28,8 +28,8 @@ const MEDIA_MODALITIES = new Set(['image', 'audio']);
  * catalog-sync — keeps the local model catalog in step with the published one.
  *
  * Twice a day (and on demand) the server pulls the signed catalog from the
- * catalog service. A valid Premium license key (Bearer) gets the live tier,
- * refreshed every 2-3 days; everyone else gets the monthly snapshot — so free
+ * catalog service. The live tier is refreshed every 2-3 days; everyone else
+ * gets the monthly snapshot — so free
  * installs still self-heal, just on a slower cadence. The response is verified
  * against a pinned Ed25519 public key over the exact bytes received; anything
  * unsigned or tampered with is discarded, which means a compromised CDN or
@@ -60,8 +60,6 @@ const BOOT_DELAY_MS = 10 * 1000; // let the server settle before first sync
 const FETCH_TIMEOUT_MS = 20 * 1000;
 
 // settings table keys
-export const SETTING_LICENSE_KEY = 'premium_license_key';
-export const SETTING_LICENSE_STATUS = 'premium_license_status'; // JSON LicenseStatus
 const SETTING_APPLIED_VERSION = 'catalog_applied_version';
 const SETTING_APPLIED_TIER = 'catalog_applied_tier';
 const SETTING_APPLIED_JSON = 'catalog_applied_json';
@@ -80,9 +78,9 @@ let fallbackFetch: FetchLike | null = null;
  * Register a second network stack for calls to the catalog service. The
  * desktop app passes Electron's net.fetch (Chromium: the OS certificate
  * verifier and system proxy, same as a browser). On some Windows PCs Node's
- * fetch could not complete the TLS handshake to api.freellmapi.co, so license
- * activation always showed "HTTP 502" while the same URL opened fine in a
- * browser. Server and Docker installs never set this.
+ * fetch could not complete the TLS handshake to api.freellmapi.co, so catalog
+ * sync showed "HTTP 502" while the same URL opened fine in a browser. Server
+ * and Docker installs never set this.
  */
 export function setCatalogFallbackFetch(fn: FetchLike | null): void {
   fallbackFetch = fn;
@@ -112,16 +110,6 @@ export async function catalogFetch(input: string | URL, init?: RequestInit): Pro
 function catalogPublicKey(): crypto.KeyObject {
   const pem = process.env.CATALOG_PUBKEY ? process.env.CATALOG_PUBKEY.replace(/\\n/g, '\n') : PINNED_CATALOG_PUBKEY;
   return crypto.createPublicKey({ key: pem, format: 'pem' });
-}
-
-export interface LicenseStatus {
-  valid: boolean;
-  plan: 'annual' | 'lifetime' | null;
-  status: string | null;
-  expiresAt: string | null;
-  cancelAtPeriodEnd?: boolean;
-  reason?: string;
-  checkedAtMs: number;
 }
 
 interface CatalogQuirk {
@@ -1079,21 +1067,18 @@ function applyCatalogInner(db: Db, catalog: Catalog): NonNullable<SyncResult['co
 
 /**
  * Fetch the catalog, verify its signature, and apply it if it moves us forward.
- * `force` skips the `since` short-circuit — used right after a license key is
- * added or removed, where the tier can change without the version changing.
+ * `force` skips the `since` short-circuit so an operator can refresh the tier
+ * without waiting for the version to change.
  */
 export async function syncCatalog(force = false): Promise<SyncResult> {
   const db = getDb();
-  const key = getSetting(SETTING_LICENSE_KEY);
   const applied = getSetting(SETTING_APPLIED_VERSION);
 
   try {
-    const headers: Record<string, string> = {};
-    if (key) headers.Authorization = `Bearer ${key}`;
     const url = new URL(`${catalogBaseUrl()}/v1/latest`);
     if (applied && !force) url.searchParams.set('since', applied);
 
-    const res = await catalogFetch(url, { headers, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+    const res = await catalogFetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
 
     if (res.status === 304) {
       setSetting(SETTING_LAST_SYNC_MS, String(Date.now()));
@@ -1164,68 +1149,6 @@ export async function syncCatalog(force = false): Promise<SyncResult> {
   }
 }
 
-/** Raw response from the catalog service's license activation endpoint. */
-export interface LicenseActivation {
-  valid: boolean;
-  plan: string | null;
-  status: string | null;
-  expiresAt: string | null;
-  reason?: string;
-}
-
-/**
- * Validate a key with the license service. Returns null when the service is
- * unreachable — distinguishable from a rejected key, so a transient outage can
- * be warned about instead of reported as a bad key. Shared by the dashboard's
- * POST /api/premium/key and declarative `license` config.
- */
-export async function validateLicenseKey(key: string, timeoutMs = FETCH_TIMEOUT_MS): Promise<LicenseActivation | null> {
-  try {
-    const res = await catalogFetch(`${catalogBaseUrl()}/v1/license/activate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key }),
-      signal: AbortSignal.timeout(timeoutMs),
-    });
-    return (await res.json()) as LicenseActivation;
-  } catch (err) {
-    console.warn(`[catalog-sync] license activation unreachable: ${describeFetchError(err)}`);
-    return null;
-  }
-}
-
-/** Revalidate the stored license against the catalog service and cache the result. */
-export async function refreshLicenseStatus(): Promise<LicenseStatus | null> {
-  const key = getSetting(SETTING_LICENSE_KEY);
-  if (!key) return null;
-  try {
-    const res = await catalogFetch(`${catalogBaseUrl()}/v1/license/check`, {
-      headers: { Authorization: `Bearer ${key}` },
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-    });
-    if (!res.ok && res.status !== 401) throw new Error(`HTTP ${res.status}`);
-    const body = (await res.json()) as Omit<LicenseStatus, 'checkedAtMs'>;
-    const status: LicenseStatus = { ...body, checkedAtMs: Date.now() };
-    setSetting(SETTING_LICENSE_STATUS, JSON.stringify(status));
-    return status;
-  } catch (err) {
-    // Offline or service down: keep the cached status. Entitlement is enforced
-    // server-side at /v1/latest anyway — this cache is informational UI state.
-    console.warn(`[catalog-sync] license check unreachable: ${err instanceof Error ? err.message : err}`);
-    return getCachedLicenseStatus();
-  }
-}
-
-export function getCachedLicenseStatus(): LicenseStatus | null {
-  const raw = getSetting(SETTING_LICENSE_STATUS);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as LicenseStatus;
-  } catch {
-    return null;
-  }
-}
-
 export interface CatalogSyncState {
   baseUrl: string;
   appliedVersion: string | null;
@@ -1291,7 +1214,6 @@ export function startCatalogSync(scheduler: Scheduler): void {
   }
   reapplyCachedCatalog();
   const run = () => {
-    void refreshLicenseStatus();
     void syncCatalog();
   };
   cancelBootTimer = scheduler.after(BOOT_DELAY_MS, run);

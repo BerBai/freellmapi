@@ -29,13 +29,13 @@ On Windows, the easiest path is the desktop app from the **[Microsoft Store](htt
 
 On Android, see the experimental [Termux installation guide](02-android-termux.md). It uses Node's built-in SQLite driver and does not require the Android NDK.
 
-Open http://localhost:3001, add your provider keys on the **Keys** page, reorder the **Fallback Chain** to taste, and grab your unified API key from the **Keys** page header. That unified key is what you point your OpenAI SDK at.
+Open http://localhost:4301, add your provider keys on the **Keys** page, reorder the **Fallback Chain** to taste, and grab your unified API key from the **Keys** page header. That unified key is what you point your OpenAI SDK at.
 
 Your install keeps itself updated from the signed catalog feed. The current full catalog is listed at [freellmapi.co/models](https://freellmapi.co/models.html).
 
 ## Docker Compose
 
-Runs the API and dashboard together on port 3001 and persists SQLite in a named volume.
+Runs the API and dashboard together on port 4301 and persists SQLite in a named volume.
 
 **Prerequisites:** Docker, Docker Compose, OpenSSL.
 
@@ -46,7 +46,7 @@ cd freellmapi
 
 # Generate an encryption key for at-rest key storage
 ENCRYPTION_KEY="$(openssl rand -hex 32)"
-printf "ENCRYPTION_KEY=%s\nPORT=3001\n" "$ENCRYPTION_KEY" > .env
+printf "ENCRYPTION_KEY=%s\nPORT=4301\n" "$ENCRYPTION_KEY" > .env
 
 docker compose up -d
 ```
@@ -59,11 +59,11 @@ cd freellmapi
 $Bytes = New-Object Byte[] 32
 [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($Bytes)
 $ENCRYPTION_KEY = -join ($Bytes | ForEach-Object { "{0:x2}" -f $_ })
-"ENCRYPTION_KEY=$ENCRYPTION_KEY`nPORT=3001" | Out-File -Encoding utf8 .env
+"ENCRYPTION_KEY=$ENCRYPTION_KEY`nPORT=4301" | Out-File -Encoding utf8 .env
 docker compose up -d
 ```
 
-> **Reaching it from another machine?** By default the container is published only on `127.0.0.1`, so `http://<server-ip>:3001` won't load from another device (the page just hangs). To expose it on your LAN — e.g. a Raspberry Pi at `http://192.168.1.x:3001` — start it with `HOST_BIND=0.0.0.0`:
+> **Reaching it from another machine?** By default the container is published only on `127.0.0.1`, so `http://<server-ip>:4301` won't load from another device (the page just hangs). To expose it on your LAN — e.g. a Raspberry Pi at `http://192.168.1.x:4301` — start it with `HOST_BIND=0.0.0.0`:
 >
 > ```bash
 > HOST_BIND=0.0.0.0 docker compose up -d
@@ -92,7 +92,7 @@ git clone https://github.com/tashfeenahmed/freellmapi.git
 cd freellmapi
 npm install
 ENCRYPTION_KEY="$(node -e 'console.log(require("crypto").randomBytes(32).toString("hex"))')"
-printf "ENCRYPTION_KEY=%s\nPORT=3001\n" "$ENCRYPTION_KEY" > .env
+printf "ENCRYPTION_KEY=%s\nPORT=4301\n" "$ENCRYPTION_KEY" > .env
 npm run dev
 ```
 
@@ -102,7 +102,7 @@ git clone https://github.com/tashfeenahmed/freellmapi.git
 cd freellmapi
 npm install
 $ENCRYPTION_KEY = node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-"ENCRYPTION_KEY=$ENCRYPTION_KEY`nPORT=3001" | Out-File -Encoding utf8 .env
+"ENCRYPTION_KEY=$ENCRYPTION_KEY`nPORT=4301" | Out-File -Encoding utf8 .env
 npm run dev
 ```
 
@@ -158,7 +158,7 @@ For a production build without Docker:
 
 ```bash
 npm run build
-node server/dist/index.js     # server + dashboard both served on :3001
+node server/dist/index.js     # server + dashboard both served on :4301
 ```
 
 ## Declarative startup config
@@ -208,8 +208,8 @@ Two optional top-level fields cover first-run provisioning:
   first-run setup window entirely: no setup code is minted and
   `POST /api/auth/setup` answers 409 from the first request on.
 - **`license`** is a Premium key from freellmapi.co. It is validated against
-  the license service before being stored — the same contract as the
-  dashboard's Premium page — then a live-tier catalog sync starts right away.
+  the license service before being stored, then a live-tier catalog sync
+  starts right away.
   Activation runs in the background so an unreachable license service never
   delays boot; a stored key identical to the configured one short-circuits
   before any network call, and a changed key re-activates (rotation).
@@ -235,7 +235,7 @@ than one endpoint is rejected rather than applied to an arbitrary one:
 FreeLLMAPI publishes a single production image that contains the Express server and the built React dashboard:
 
 ```bash
-docker pull ghcr.io/tashfeenahmed/freellmapi:latest   # or pin a release, e.g. :v1.2.3
+docker pull ghcr.io/berbai/llmself:latest   # or pin a release, e.g. :v1.2.3
 ```
 
 The image is multi-arch (`linux/amd64` + `linux/arm64`, so it runs on a Raspberry Pi). Published tags: `latest` (the newest release), `main` (the default branch), `v*.*.*` (git release tags), and `sha-<commit>`.
@@ -410,7 +410,7 @@ the top.
 
 ```bash
 docker compose down -v            # -v also drops the freellmapi-data volume
-docker image rm ghcr.io/tashfeenahmed/freellmapi:latest
+docker image rm ghcr.io/berbai/llmself:latest
 rm -rf ~/freellmapi               # the one-liner's directory: .env + compose file
 ```
 

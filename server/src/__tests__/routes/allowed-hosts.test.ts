@@ -61,26 +61,26 @@ describe('Host-header guard (#1637)', () => {
     // desktop-LAN and reverse-proxy installs the moment they upgraded.
     it('lets any Host through, including LAN IPs, container names and proxies', async () => {
       const app = appWithAllowed(undefined);
-      for (const host of ['localhost:3001', '192.168.1.50:3001', 'freellmapi:3001', 'proxy.example.com', 'evil.example:3001']) {
+      for (const host of ['localhost:4301', '192.168.1.50:4301', 'freellmapi:4301', 'proxy.example.com', 'evil.example:4301']) {
         expect((await call(app, '/api/ping', host)).status, host).toBe(200);
       }
     });
 
     it('an empty ALLOWED_HOSTS is also off', async () => {
-      expect((await call(appWithAllowed('  '), '/api/ping', '192.168.1.50:3001')).status).toBe(200);
+      expect((await call(appWithAllowed('  '), '/api/ping', '192.168.1.50:4301')).status).toBe(200);
     });
   });
 
   describe('loopback-only (ALLOWED_HOSTS=localhost)', () => {
     it('rejects a rebinding hostname with 403 before routing', async () => {
-      const res = await call(appWithAllowed('localhost'), '/api/ping', 'evil.example:3001');
+      const res = await call(appWithAllowed('localhost'), '/api/ping', 'evil.example:4301');
       expect(res.status).toBe(403);
       expect(JSON.parse(res.body).error.message).toContain('ALLOWED_HOSTS');
     });
 
     it('accepts the loopback names on any port', async () => {
       const app = appWithAllowed('localhost');
-      for (const host of ['localhost:3001', '127.0.0.1:3001', '[::1]:3001', 'app.localhost']) {
+      for (const host of ['localhost:4301', '127.0.0.1:4301', '[::1]:4301', 'app.localhost']) {
         const res = await call(app, '/api/ping', host);
         expect(res.status, host).toBe(200);
       }
@@ -91,38 +91,38 @@ describe('Host-header guard (#1637)', () => {
     });
 
     it('rejects an unlisted LAN IP', async () => {
-      expect((await call(appWithAllowed('localhost'), '/api/ping', '192.168.1.50:3001')).status).toBe(403);
+      expect((await call(appWithAllowed('localhost'), '/api/ping', '192.168.1.50:4301')).status).toBe(403);
     });
   });
 
   describe('ALLOWED_HOSTS entries', () => {
     it('accepts a listed hostname, case-insensitively, ignoring the port', async () => {
       const app = appWithAllowed('ai.home.arpa, DASH.Example.COM');
-      expect((await call(app, '/api/ping', 'ai.home.arpa:3001')).status).toBe(200);
+      expect((await call(app, '/api/ping', 'ai.home.arpa:4301')).status).toBe(200);
       expect((await call(app, '/api/ping', 'dash.example.com')).status).toBe(200);
     });
 
     it('still rejects unlisted hostnames', async () => {
       const app = appWithAllowed('ai.home.arpa');
-      expect((await call(app, '/api/ping', 'evil.example:3001')).status).toBe(403);
+      expect((await call(app, '/api/ping', 'evil.example:4301')).status).toBe(403);
       // A suffix-lookalike of an allowed name is not allowed.
       expect((await call(app, '/api/ping', 'ai.home.arpa.evil.example')).status).toBe(403);
     });
 
     it('still accepts loopback alongside the entries', async () => {
       const app = appWithAllowed('ai.home.arpa');
-      expect((await call(app, '/api/ping', 'localhost:3001')).status).toBe(200);
+      expect((await call(app, '/api/ping', 'localhost:4301')).status).toBe(200);
     });
 
     it('a single * disables the guard', async () => {
       const app = appWithAllowed('*');
-      expect((await call(app, '/api/ping', 'evil.example:3001')).status).toBe(200);
+      expect((await call(app, '/api/ping', 'evil.example:4301')).status).toBe(200);
     });
   });
 
   describe('guard runs before auth', () => {
     it('403s an unauthenticated /api/keys call on a bad Host (not 401)', async () => {
-      const res = await call(appWithAllowed('localhost'), '/api/keys', 'evil.example:3001');
+      const res = await call(appWithAllowed('localhost'), '/api/keys', 'evil.example:4301');
       expect(res.status).toBe(403);
     });
   });

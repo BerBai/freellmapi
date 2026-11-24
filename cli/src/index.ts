@@ -50,7 +50,7 @@ function parseTimeout(value: string): number {
 
 export function parseArgs(argv: string[]): { command?: string; options: CliOptions } {
   const options: CliOptions = {
-    url: process.env.FREELLMAPI_URL || 'http://localhost:3001',
+    url: process.env.FREELLMAPI_URL || 'http://localhost:4301',
     apiKey: process.env.FREELLMAPI_API_KEY,
     token: process.env.FREELLMAPI_DASHBOARD_TOKEN,
     profile: 'default',

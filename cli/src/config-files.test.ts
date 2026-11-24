@@ -277,7 +277,7 @@ describe('safe config writes', () => {
         'llm-pi-ai': {
           providers: {
             freellmapi: {
-              baseURL: 'http://localhost:3001/v1',
+              baseURL: 'http://localhost:4301/v1',
               models: [{ id: 'auto' }],
             },
           },
@@ -293,7 +293,7 @@ describe('safe config writes', () => {
     expect(once).toContain('# my settings');
     expect(once).toContain('# keep me');
     expect(once).toContain('apiKeyEnv: ANTHROPIC_API_KEY');
-    expect(once).toContain('baseURL: http://localhost:3001/v1');
+    expect(once).toContain('baseURL: http://localhost:4301/v1');
     expect(once).not.toContain('http://old:1/v1');
     expect(once).not.toContain('stale');
     expect(once).toContain('provider: freellmapi');
@@ -533,7 +533,7 @@ describe('safe config writes', () => {
       '[[providers]]',
       'name = "freellmapi"',
       'kind = "openai"',
-      'base_url = "http://localhost:3001/v1"',
+      'base_url = "http://localhost:4301/v1"',
       'models = ["auto"]',
     ].join('\n');
     const merged = renderFile({ path: '/unused', format: 'toml', content: generated }, existing);
@@ -547,7 +547,7 @@ describe('safe config writes', () => {
     expect(merged).toContain('[[plugins]]\nname = "freellmapi"\ncommand = "keep-me"');
     expect(merged.match(/^\[\[providers\]\]$/gm)).toHaveLength(2);
     expect(merged).not.toContain('stale');
-    expect(merged).toContain('base_url = "http://localhost:3001/v1"');
+    expect(merged).toContain('base_url = "http://localhost:4301/v1"');
     expect(renderFile({ path: '/unused', format: 'toml', content: generated }, merged)).toBe(merged);
   });
 

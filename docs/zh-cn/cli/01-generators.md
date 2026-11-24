@@ -5,13 +5,13 @@
 ## 用法
 
 ```bash
-npx freellmapi setup-claude        # 接入 Claude Code
-npx freellmapi setup-codex         # 接入 Codex CLI
-npx freellmapi setup-dsh           # 接入 DeepSeek Harness
-npx freellmapi setup-mimo          # 接入 MiMo Code
-npx freellmapi setup-atomcode      # 接入 AtomCode
-npx freellmapi --dry-run setup-claude  # 预览而不写入
-npx freellmapi setup-claude --model gpt-4o  # 固定模型
+npx llmself setup-claude        # 接入 Claude Code
+npx llmself setup-codex         # 接入 Codex CLI
+npx llmself setup-dsh           # 接入 DeepSeek Harness
+npx llmself setup-mimo          # 接入 MiMo Code
+npx llmself setup-atomcode      # 接入 AtomCode
+npx llmself --dry-run setup-claude  # 预览而不写入
+npx llmself setup-claude --model gpt-4o  # 固定模型
 ```
 
 每个生成器（`cli/src/tools.ts:52-622`）都会拉取实时目录、对照未过滤目录解析 `--model`（`c942352`）、对已有配置做带时间戳的备份、在不覆盖无关键的前提下合并，并以 `0600` 权限写入。
@@ -40,16 +40,16 @@ npx freellmapi setup-claude --model gpt-4o  # 固定模型
 ## 零持久化启动器
 
 ```bash
-npx freellmapi launch            # 仅在 env 中注入 FREELLMAPI_API_KEY + model 并启动 `claude`
-npx freellmapi launch-codex      # 注入到 `codex --profile NAME`
+npx llmself launch            # 仅在 env 中注入 FREELLMAPI_API_KEY + model 并启动 `claude`
+npx llmself launch-codex      # 注入到 `codex --profile NAME`
 ```
 
 这些命令不会写入配置文件；它们仅在子进程的环境变量中注入 `FREELLMAPI_API_KEY`/`FREELLMAPI_MODEL`。适用于临时或共享机器。
 
-## `freellmapi doctor`
+## `llmself doctor`
 
 ```bash
-npx freellmapi doctor
+npx llmself doctor
 ```
 
 验证客户端请求是否到达本网关（检查已路由的 `Authorization` 头、目录、实时探针）。

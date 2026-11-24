@@ -89,14 +89,14 @@ describe('apiFetch error messages', () => {
     vi.restoreAllMocks()
   })
 
-  it('shows a plain-string error body instead of the bare status (Premium activation)', async () => {
+  it('shows a plain-string error body instead of the bare status (catalog sync)', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => jsonResponse(502, {
-      error: 'Could not reach the license service. Check your connection and try again.',
+      error: 'Could not reach the catalog service. Check your connection and try again.',
     })))
     const { apiFetch } = await import('./api')
-    await expect(apiFetch('/api/premium/key', { method: 'POST', body: '{}' })).rejects.toMatchObject({
+    await expect(apiFetch('/api/catalog/sync', { method: 'POST', body: '{}' })).rejects.toMatchObject({
       status: 502,
-      message: 'Could not reach the license service. Check your connection and try again.',
+      message: 'Could not reach the catalog service. Check your connection and try again.',
     })
   })
 

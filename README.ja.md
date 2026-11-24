@@ -128,7 +128,7 @@
 ほとんどのエージェントは、1 つのコマンドで自動設定できます。このコマンドは稼働中のカタログを読み取り、既存の設定をバックアップしてからマージします。
 
 ```bash
-npx freellmapi setup-claude --url http://localhost:3001 --api-key <unified-key>
+npx freellmapi setup-claude --url http://localhost:4301 --api-key <unified-key>
 ```
 
 **[対応エージェントの一覧とセットアップコマンド →](docs/en/clients/02-supported-agents.md)** · [ツールごとのレシピ、MCP サーバー、URL トークン →](docs/en/clients/01-agent-clients.md)
@@ -173,7 +173,7 @@ curl -fsSL https://freellmapi.co/install.sh | bash
 
 パイプで bash に渡す前に中身を読みたい方は、[スクリプトはこちら](https://freellmapi.co/install.sh)です。再実行しても安全で、`.env`(と暗号化キー)は保持され、コンテナーは `:latest` に更新されます。
 
-http://localhost:3001 を開き、**キー**ページでプロバイダーのキーを追加し、**Fallback Chain** をお好みに並べ替えて、**キー**ページのヘッダーから統合 API キーを取得します。この統合キーが、OpenAI SDK の向け先になります。
+http://localhost:4301 を開き、**キー**ページでプロバイダーのキーを追加し、**Fallback Chain** をお好みに並べ替えて、**キー**ページのヘッダーから統合 API キーを取得します。この統合キーが、OpenAI SDK の向け先になります。
 
 Windows では、**[Microsoft Store](https://apps.microsoft.com/detail/9PBN6G8K2B7F)** のデスクトップアプリがもっとも簡単です。署名済みなので Smart App Control でも実行でき、自動で更新されます。[Releases](https://github.com/tashfeenahmed/freellmapi/releases/latest) にある `.exe` インストーラーは同じアプリの未署名版です(下記)。Android については、実験的な [Termux ガイド](docs/en/install/02-android-termux.md)をご覧ください。
 
@@ -191,7 +191,7 @@ macOS 12 Monterey 以降では、**arm64 (Apple Silicon)** か **x64 (Intel)** �
 
 ## OpenAI 互換クライアントでの利用
 
-OpenAI 互換のベース URL を指定できるものなら何でも動きます。ベース URL を `http://localhost:3001/v1` に設定し、ダッシュボードの統合キーを使ってください。どのジェネレーターも `--dry-run` に対応しており、`npx freellmapi launch`(Claude Code)と `launch-codex`(Codex)は、認証情報を設定ファイルにまったく残しません。ルーターは、エージェントがセッションの途中で内部を調べられる MCP サーバーとしても機能します。
+OpenAI 互換のベース URL を指定できるものなら何でも動きます。ベース URL を `http://localhost:4301/v1` に設定し、ダッシュボードの統合キーを使ってください。どのジェネレーターも `--dry-run` に対応しており、`npx freellmapi launch`(Claude Code)と `launch-codex`(Codex)は、認証情報を設定ファイルにまったく残しません。ルーターは、エージェントがセッションの途中で内部を調べられる MCP サーバーとしても機能します。
 
 **ChatGPT** は、非公開の Secure MCP Tunnel を通じて、同じローカルルーターに接続します。
 `ask_freellmapi` MCP ツールは、ChatGPT から依頼されたタスクを `/v1/chat/completions` 経由でルーティングし、
@@ -270,7 +270,7 @@ PR をお待ちしています。
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="http://localhost:3001/v1",
+    base_url="http://localhost:4301/v1",
     api_key="freellmapi-your-unified-key",
 )
 
@@ -343,7 +343,7 @@ print("Routed via:", response.headers.get("x-routed-via"))
 - **ダッシュボードの磨き込み** — 分析ページのグラフ、キーのローテーションの UX、`.env` からのキーの一括インポート。
 - **ドキュメント** — 例の追加、Go/Rust などのクライアントライブラリのスニペット、Docker や Fly 向けのデプロイレシピ。
 
-`npm install && npm run dev` で、サーバーが :3001、ダッシュボードが :5173 で起動し、どちらも HMR に対応しています。再現性のあるセットアップには、Bash では `./scripts/dev-bootstrap.sh`、PowerShell では `.\scripts\dev-bootstrap.ps1` を使ってください。どちらも既存の `.env` を保持します。PR にはテストを含め、既存のスイートを通し(`npm test`)、リポジトリにすでにある `.editorconfig` / tsconfig のデフォルトに合わせてください。データベースマイグレーションのワークフローとコントリビューターの全体的な流れは [CONTRIBUTING.md](./CONTRIBUTING.md) にあります。
+`npm install && npm run dev` で、サーバーが :4301、ダッシュボードが :5173 で起動し、どちらも HMR に対応しています。再現性のあるセットアップには、Bash では `./scripts/dev-bootstrap.sh`、PowerShell では `.\scripts\dev-bootstrap.ps1` を使ってください。どちらも既存の `.env` を保持します。PR にはテストを含め、既存のスイートを通し(`npm test`)、リポジトリにすでにある `.editorconfig` / tsconfig のデフォルトに合わせてください。データベースマイグレーションのワークフローとコントリビューターの全体的な流れは [CONTRIBUTING.md](./CONTRIBUTING.md) にあります。
 
 ### コントリビューター
 

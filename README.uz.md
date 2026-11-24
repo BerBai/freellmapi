@@ -127,7 +127,7 @@ To'liq va doim dolzarb ro'yxat **[freellmapi.co/models](https://freellmapi.co/mo
 Ko'pchilik agentlar bitta buyruq bilan sozlanadi: u jonli katalogingizni o'qiydi, mavjud konfiguratsiyaning zaxira nusxasini oladi va o'zgarishlarni unga qo'shadi:
 
 ```bash
-npx freellmapi setup-claude --url http://localhost:3001 --api-key <unified-key>
+npx freellmapi setup-claude --url http://localhost:4301 --api-key <unified-key>
 ```
 
 **[Barcha qo'llab-quvvatlanadigan agentlar va ularni sozlash buyruqlari →](docs/en/clients/02-supported-agents.md)** · [Har bir vosita uchun retseptlar, MCP server va URL tokenlar →](docs/en/clients/01-agent-clients.md)
@@ -172,7 +172,7 @@ curl -fsSL https://freellmapi.co/install.sh | bash
 
 bash'ga yuborishdan oldin o'qib chiqmoqchimisiz? [Skript shu yerda](https://freellmapi.co/install.sh). Uni qayta ishga tushirish xavfsiz: `.env` faylingiz (va shifrlash kaliti) saqlanib qoladi, konteyner esa `:latest` ga yangilanadi.
 
-http://localhost:3001 ni oching, **Kalitlar** (Keys) sahifasida provayder kalitlaringizni qo'shing, **Fallback Chain** tartibini xohishingizga ko'ra o'zgartiring va **Kalitlar** sahifasining yuqori qismidan birlashtirilgan API kalitingizni oling. OpenAI SDK'ingizga aynan shu birlashtirilgan kalitni berasiz.
+http://localhost:4301 ni oching, **Kalitlar** (Keys) sahifasida provayder kalitlaringizni qo'shing, **Fallback Chain** tartibini xohishingizga ko'ra o'zgartiring va **Kalitlar** sahifasining yuqori qismidan birlashtirilgan API kalitingizni oling. OpenAI SDK'ingizga aynan shu birlashtirilgan kalitni berasiz.
 
 Windows'da eng oson yo'l: desktop ilovani **[Microsoft Store](https://apps.microsoft.com/detail/9PBN6G8K2B7F)**'dan o'rnatish: u imzolangan (Smart App Control uni bloklamaydi) va o'zi yangilanadi. Imzolanmagan `.exe` o'rnatuvchisi [Releases](https://github.com/tashfeenahmed/freellmapi/releases/latest)'da (quyida). Android uchun tajriba bosqichidagi [Termux qo'llanmasiga](docs/en/install/02-android-termux.md) qarang.
 
@@ -190,7 +190,7 @@ macOS 12 Monterey yoki undan yangi versiyalar uchun **arm64 (Apple Silicon)** yo
 
 ## OpenAI bilan mos klientlar
 
-OpenAI bilan mos base URL'ga ulana oladigan har qanday dastur ishlaydi: uni dashboard'dagi birlashtirilgan kalit bilan `http://localhost:3001/v1` ga sozlang. Har bir generator `--dry-run` ni qo'llab-quvvatlaydi. `npx freellmapi launch` (Claude Code) va `launch-codex` (Codex) maxfiy ma'lumotlarni konfiguratsiya fayllariga umuman yozmaydi. Router bir vaqtning o'zida MCP server ham bo'lib xizmat qiladi, agentlaringiz sessiya davomida u orqali ma'lumot olishi mumkin.
+OpenAI bilan mos base URL'ga ulana oladigan har qanday dastur ishlaydi: uni dashboard'dagi birlashtirilgan kalit bilan `http://localhost:4301/v1` ga sozlang. Har bir generator `--dry-run` ni qo'llab-quvvatlaydi. `npx freellmapi launch` (Claude Code) va `launch-codex` (Codex) maxfiy ma'lumotlarni konfiguratsiya fayllariga umuman yozmaydi. Router bir vaqtning o'zida MCP server ham bo'lib xizmat qiladi, agentlaringiz sessiya davomida u orqali ma'lumot olishi mumkin.
 
 **ChatGPT** xuddi shu lokal routerga xususiy Secure MCP Tunnel orqali ulanadi. `ask_freellmapi`
 MCP vositasi ChatGPT so'ragan vazifani `/v1/chat/completions` orqali yo'naltiradi va javobni
@@ -270,7 +270,7 @@ qachon ko'rmaydi. Ikkala holatda ham router to'liq o'zingizning serveringizda is
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="http://localhost:3001/v1",
+    base_url="http://localhost:4301/v1",
     api_key="freellmapi-your-unified-key",
 )
 
@@ -342,7 +342,7 @@ Hissa qo'shuvchilarni juda mamnuniyat bilan kutamiz! Ishlab chiqish jarayoni, PR
 - **Dashboard'ni sayqallash**: Analitika sahifasidagi grafiklar, kalitlarni almashtirish UX'i, `.env` dan kalitlarni ommaviy import qilish.
 - **Hujjatlar**: ko'proq misollar, Go/Rust va boshqa tillar uchun klient kutubxonasi parchalari, Docker yoki Fly uchun deploy retsepti.
 
-`npm install && npm run dev` serverni :3001 portida va dashboard'ni :5173 portida ishga tushiradi, ikkalasi ham HMR bilan. Takrorlanadigan sozlash uchun Bash'da `./scripts/dev-bootstrap.sh` yoki PowerShell'da `.\scripts\dev-bootstrap.ps1` dan foydalaning; ikkalasi ham mavjud `.env` ni saqlab qoladi. PR'larda test bo'lishi, mavjud testlar to'liq o'tishi (`npm test`) va repodagi `.editorconfig` / tsconfig sozlamalariga mos kelishi kerak. Ma'lumotlar bazasi migratsiyalari va hissa qo'shishning to'liq jarayoni [CONTRIBUTING.md](./CONTRIBUTING.md) da.
+`npm install && npm run dev` serverni :4301 portida va dashboard'ni :5173 portida ishga tushiradi, ikkalasi ham HMR bilan. Takrorlanadigan sozlash uchun Bash'da `./scripts/dev-bootstrap.sh` yoki PowerShell'da `.\scripts\dev-bootstrap.ps1` dan foydalaning; ikkalasi ham mavjud `.env` ni saqlab qoladi. PR'larda test bo'lishi, mavjud testlar to'liq o'tishi (`npm test`) va repodagi `.editorconfig` / tsconfig sozlamalariga mos kelishi kerak. Ma'lumotlar bazasi migratsiyalari va hissa qo'shishning to'liq jarayoni [CONTRIBUTING.md](./CONTRIBUTING.md) da.
 
 ### Hissa qo'shganlar
 

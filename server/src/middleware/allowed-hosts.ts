@@ -19,13 +19,13 @@ import type { Request, Response, NextFunction } from 'express';
 // '*' keeps it off explicitly.
 //
 // Matching is on the HOSTNAME ONLY, never host:port: Compose remaps the outer
-// port freely (HOST_BIND + ports: "127.0.0.1:${HOST_PORT:-3001}:3001") and the
+// port freely (HOST_BIND + ports: "127.0.0.1:${HOST_PORT:-4301}:4301") and the
 // rebinding threat has nothing to do with ports.
 
 const DEFAULT_ALLOWED_HOSTS = ['localhost', '127.0.0.1', '::1'];
 
 /** Lowercase hostname from a raw Host header value, or null if malformed.
- *  URL parsing is what makes `[::1]:3001` (bracketed IPv6), `host` and
+ *  URL parsing is what makes `[::1]:4301` (bracketed IPv6), `host` and
  *  `host:port` all yield a comparable bare hostname. WHATWG URL keeps the
  *  brackets on an IPv6 hostname (`[::1]`), so they are stripped for the
  *  comparison set. */

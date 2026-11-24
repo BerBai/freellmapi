@@ -262,7 +262,7 @@ register(new OpenAICompatProvider({
   name: 'OpenRouter',
   baseUrl: 'https://openrouter.ai/api/v1',
   extraHeaders: {
-    'HTTP-Referer': 'http://localhost:3001',
+    'HTTP-Referer': 'http://localhost:4301',
     'X-Title': 'FreeLLMAPI',
   },
   // #1403: OpenRouter reports the key's real credit balance and hard limit on

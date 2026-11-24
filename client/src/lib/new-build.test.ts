@@ -13,7 +13,7 @@ describe('new build detection', () => {
 
   it('reports a new build only when the fingerprinted entry changed', () => {
     expect(isNewBuild('/assets/index-Ab12.js', page('/assets/index-Ab12.js'))).toBe(false)
-    expect(isNewBuild('http://127.0.0.1:3001/assets/index-Ab12.js', page('/assets/index-Ef56.js'))).toBe(true)
+    expect(isNewBuild('http://127.0.0.1:4301/assets/index-Ab12.js', page('/assets/index-Ef56.js'))).toBe(true)
   })
 
   it('never fires on a dev server or an unreadable page', () => {

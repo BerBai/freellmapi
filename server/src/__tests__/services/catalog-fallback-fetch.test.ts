@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { catalogFetch, setCatalogFallbackFetch, validateLicenseKey } from '../../services/catalog-sync.js';
+import { catalogFetch, setCatalogFallbackFetch } from '../../services/catalog-sync.js';
 
 // Node's fetch failing the TLS handshake surfaces as TypeError('fetch failed')
 // with the real reason on .cause — what Windows desktop users hit.
@@ -40,10 +40,10 @@ describe('catalogFetch', () => {
     setCatalogFallbackFetch(fallback);
 
     const init = { method: 'POST', body: '{}' };
-    const res = await catalogFetch('https://catalog.test/v1/license/activate', init);
+    const res = await catalogFetch('https://catalog.test/v1/latest', init);
     expect(await res.json()).toEqual({ ok: 'fallback' });
     expect(fallback).toHaveBeenCalledTimes(1);
-    expect(fallback).toHaveBeenCalledWith('https://catalog.test/v1/license/activate', init);
+    expect(fallback).toHaveBeenCalledWith('https://catalog.test/v1/latest', init);
     expect(String((console.warn as unknown as { mock: { calls: unknown[][] } }).mock.calls[0][0]))
       .toContain('UNABLE_TO_GET_ISSUER_CERT_LOCALLY');
   });
@@ -62,24 +62,5 @@ describe('catalogFetch', () => {
 
     await expect(catalogFetch('https://catalog.test/v1/latest', { signal: controller.signal })).rejects.toThrow();
     expect(fallback).not.toHaveBeenCalled();
-  });
-});
-
-describe('validateLicenseKey', () => {
-  it('activates through the fallback when Node fetch cannot reach the service', async () => {
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    vi.stubGlobal('fetch', vi.fn(async () => { throw tlsFailure(); }));
-    setCatalogFallbackFetch(async () => json({ valid: true, plan: 'lifetime', status: 'active' }));
-
-    await expect(validateLicenseKey('fla_TESTKEY')).resolves.toMatchObject({ valid: true, plan: 'lifetime' });
-  });
-
-  it('returns null (unreachable) and logs the cause when both stacks fail', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    vi.stubGlobal('fetch', vi.fn(async () => { throw tlsFailure(); }));
-    setCatalogFallbackFetch(async () => { throw new Error('net::ERR_CONNECTION_REFUSED'); });
-
-    await expect(validateLicenseKey('fla_TESTKEY')).resolves.toBeNull();
-    expect(warn.mock.calls.some(c => String(c[0]).includes('license activation unreachable: net::ERR_CONNECTION_REFUSED'))).toBe(true);
   });
 });

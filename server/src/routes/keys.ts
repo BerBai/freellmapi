@@ -261,11 +261,8 @@ function insertImportedKey(platform: (typeof PLATFORMS)[number], keyName: string
 }
 
 // Count enabled catalog models for a platform. Used to warn when a key is
-// added for a provider that has zero models in the operator's current catalog
-// tier — the Agnes case (#438): the provider is registered and selectable, but
-// its models ship in the premium/live catalog and only appear for free-tier
-// installs once they age into the monthly catalog, so a fresh install adds the
-// key and silently sees nothing.
+// added for a provider that has zero models in the operator's current catalog,
+// so a fresh install can add the key and silently see nothing.
 /**
  * Whether a stored row belongs in an export file. Kept in one place because the
  * export dialog shows a count before downloading, and computing that count from
@@ -285,8 +282,7 @@ export function isExportableKey(row: { platform: string; baseUrl: string | null;
 // Every model a platform's key can serve: chat rows, plus embedding and
 // generative-media rows. Media-only providers (Speechify is TTS-only) never
 // have a chat row, so counting `models` alone reported "no models" — and fired
-// the no-catalog notice — for them even on a fully synced Premium install
-// (#1327).
+// the no-catalog notice — for them even on a fully synced catalog.
 function enabledModelCount(platform: string): number {
   const db = getDb();
   const row = db.prepare(`
@@ -309,11 +305,8 @@ function openAICompatBaseUrl(platform: string): string | null {
 // Non-null when the just-added key has no usable models yet, so the client can
 // explain the silence instead of leaving the user staring at an empty list.
 //
-// #1327: the old copy told a Premium user to "add a Premium license key", and
-// told everyone to add the provider as a custom OpenAI-compatible endpoint
-// "with its base URL" without naming it — even for providers with no such
-// endpoint. The notice now matches the install's actual catalog tier, names
-// the base URL, and only offers the custom-provider route where it works.
+// The notice names the base URL and only offers the custom-provider route
+// where it works.
 function noModelsNotice(platform: string): string | undefined {
   if (enabledModelCount(platform) > 0) return undefined;
   // Search keys have engines, not models (#1174): a key whose engine is off
@@ -322,8 +315,8 @@ function noModelsNotice(platform: string): string | undefined {
   if (isSearchPlatform(platform)) {
     return `Key saved, but no ${platform} search engine is turned on. Turn it on from Models → Search.`;
   }
-  // #1348: a built-in provider the catalog does not carry fills its model list
-  // from its own /models, so the Premium and custom-provider advice below
+  // A built-in provider the catalog does not carry fills its model list from
+  // its own /models, so the catalog-sync and custom-provider advice below
   // would send the operator the wrong way.
   if (isBuiltinDiscoveryEligible(getDb(), platform)) {
     return builtinDiscoveryMode() === 'auto'
@@ -335,19 +328,17 @@ function noModelsNotice(platform: string): string | undefined {
   const customRoute = baseUrl
     ? `add ${platform} as a custom OpenAI-compatible provider with base URL ${baseUrl}`
     : null;
-  const premium = getSyncState().appliedTier === 'live';
-  if (premium) {
+  if (getSyncState().appliedTier === 'live') {
     return (
-      `Key saved, but your Premium catalog does not list any ${platform} models yet. ` +
-      `Try Check for updates on the Premium page to pull the latest catalog` +
+      `Key saved, but your catalog does not list any ${platform} models yet. ` +
+      `POST /api/catalog/sync to pull the latest catalog` +
       (customRoute ? `, or ${customRoute}.` : '.')
     );
   }
   return (
     `Key saved, but no ${platform} models are in your current catalog yet. ` +
-    `Newer providers are published to the premium catalog first and appear ` +
-    `for free-tier installs once they age into the monthly catalog. ` +
-    `Add a Premium license key to use them now` +
+    `Newer providers can appear as the monthly catalog ages. ` +
+    `POST /api/catalog/sync to refresh it now` +
     (customRoute ? `, or ${customRoute}.` : '.')
   );
 }

@@ -93,7 +93,7 @@ describe('url comparison', () => {
   it('ignores trailing slashes, a /v1 suffix, and host case', () => {
     expect(normalizeUrl('http://Localhost:3000/v1/')).toBe('http://localhost:3000');
     expect(sameGateway('http://localhost:3000', 'http://localhost:3000/v1')).toBe(true);
-    expect(sameGateway('http://localhost:3000', 'http://localhost:3001')).toBe(false);
+    expect(sameGateway('http://localhost:3000', 'http://localhost:4301')).toBe(false);
     expect(sameGateway(undefined, 'http://localhost:3000')).toBe(false);
   });
 

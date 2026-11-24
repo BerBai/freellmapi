@@ -651,7 +651,7 @@ export function noSearchMessage(s: SearchStatus = searchStatus()): string {
   if (keyed.length > 0) remedies.push(`add a ${listOf(keyed, 'or')} key`);
   if (remedies.length > 0) parts.push(`To search, ${remedies.join(', or ')} on the Keys page.`);
   if (off.length > 0) parts.push(`Turned off under Models → Search: ${listOf([...new Set(off.map(e => platformName(e.platform)))], 'and')}.`);
-  if (s.engines.length === 0) parts.push('The installed catalog has no search engines. Check for a catalog update on the Premium page.');
+  if (s.engines.length === 0) parts.push('The installed catalog has no search engines. Check for a catalog update.');
   return `No search engine is ready. ${parts.join(' ')}`.trim();
 }
 

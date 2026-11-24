@@ -21,7 +21,7 @@ FreeLLMAPI 是一个自托管的、兼容 OpenAI 的网关，把约 87 家提供
 
 ```
 ┌──────────────────┐   Bearer freellmapi-…   ┌─────────────────────────┐
-│  OpenAI SDK /    │ ──────────────────────▶ │  Express proxy (:3001)  │
+│  OpenAI SDK /    │ ──────────────────────▶ │  Express proxy (:4301)  │
 │  curl / any      │ ◀────────────────────── │  /v1/chat/completions   │
 │  OpenAI client   │      streamed tokens    └────────────┬────────────┘
 └──────────────────┘                                      │

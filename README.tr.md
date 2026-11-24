@@ -131,7 +131,7 @@ Model bazında hız sınırları, bağlam pencereleri ve ücretsiz token bütçe
 Çoğu ajan, canlı kataloğunuzu okuyup mevcut yapılandırmayı yedekleyen ve yeni ayarları onunla birleştiren tek bir komutla yapılandırılabilir:
 
 ```bash
-npx freellmapi setup-claude --url http://localhost:3001 --api-key <unified-key>
+npx freellmapi setup-claude --url http://localhost:4301 --api-key <unified-key>
 ```
 
 **[Desteklenen tüm ajanlar ve kurulum komutları →](docs/en/clients/02-supported-agents.md)** · [Araçlara özel ayarlar, MCP sunucusu ve URL tokenları →](docs/en/clients/01-agent-clients.md)
@@ -182,7 +182,7 @@ curl -fsSL https://freellmapi.co/install.sh | bash
 
 Bash’e aktarmadan önce okumak ister misiniz? [Betik burada](https://freellmapi.co/install.sh). Yeniden çalıştırmak güvenlidir: `.env` dosyanız ve şifreleme anahtarınız korunur, konteyner `:latest` sürümüne güncellenir.
 
-http://localhost:3001 adresini açın, **Anahtarlar (Keys)** sayfasına sağlayıcı anahtarlarınızı ekleyin, **Yedek Model Zinciri (Fallback Chain)** sırasını istediğiniz gibi düzenleyin ve **Anahtarlar** sayfasının üst kısmından birleşik API anahtarınızı alın. OpenAI SDK’nızda bu birleşik anahtarı kullanın.
+http://localhost:4301 adresini açın, **Anahtarlar (Keys)** sayfasına sağlayıcı anahtarlarınızı ekleyin, **Yedek Model Zinciri (Fallback Chain)** sırasını istediğiniz gibi düzenleyin ve **Anahtarlar** sayfasının üst kısmından birleşik API anahtarınızı alın. OpenAI SDK’nızda bu birleşik anahtarı kullanın.
 
 Windows’ta en kolay yol, masaüstü uygulamasını **[Microsoft Store](https://apps.microsoft.com/detail/9PBN6G8K2B7F)** üzerinden kurmaktır: imzalıdır (Smart App Control engellemez) ve kendini günceller. İmzasız `.exe` yükleyicisi [Releases](https://github.com/tashfeenahmed/freellmapi/releases/latest) bölümündedir (aşağıda). Android için deneysel [Termux rehberine](docs/en/install/02-android-termux.md) bakın.
 
@@ -204,7 +204,7 @@ macOS 12 Monterey ve sonrası için **arm64 (Apple Silicon)** veya **x64 (Intel)
 
 ## OpenAI uyumlu istemcilerle kullanım
 
-OpenAI uyumlu bir temel URL’ye bağlanabilen tüm istemciler çalışır: adresi `http://localhost:3001/v1` olarak ayarlayın ve paneldeki birleşik anahtarı kullanın. Tüm yapılandırma üreticileri `--dry-run` seçeneğini destekler. `npx freellmapi launch` (Claude Code) ve `launch-codex` (Codex), kimlik bilgilerini yapılandırma dosyalarına hiç yazmaz. Yönlendirici, ajanlarınızın oturum sırasında inceleyebileceği bir MCP sunucusu olarak da çalışır.
+OpenAI uyumlu bir temel URL’ye bağlanabilen tüm istemciler çalışır: adresi `http://localhost:4301/v1` olarak ayarlayın ve paneldeki birleşik anahtarı kullanın. Tüm yapılandırma üreticileri `--dry-run` seçeneğini destekler. `npx freellmapi launch` (Claude Code) ve `launch-codex` (Codex), kimlik bilgilerini yapılandırma dosyalarına hiç yazmaz. Yönlendirici, ajanlarınızın oturum sırasında inceleyebileceği bir MCP sunucusu olarak da çalışır.
 
 **ChatGPT**, özel bir Secure MCP Tunnel üzerinden aynı yerel yönlendiriciye bağlanır. `ask_freellmapi` MCP aracı, ChatGPT’nin istediği görevi `/v1/chat/completions` üzerinden yönlendirir; yanıtı kullanılan model, yedek modele geçiş, önbellek, yürütme ve token üst verileriyle döndürür. Temel URL ve bearer kimlik doğrulaması tünel istemcisinin yapılandırmasında tutulur. Varsayılan model `MCP_INFERENCE_DEFAULT_MODEL` ile ayarlanır (belirtilmezse `auto`). Anahtarları Git’e veya MCP URL’sine eklemeyin. **[ChatGPT kurulumu →](docs/en/clients/01-agent-clients.md#chatgpt-private-secure-mcp-tunnel)**
 
@@ -255,7 +255,7 @@ Katalog sunucusu istemlerinizi, model yanıtlarınızı veya sağlayıcı anahta
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="http://localhost:3001/v1",
+    base_url="http://localhost:4301/v1",
     api_key="freellmapi-your-unified-key",
 )
 
@@ -337,7 +337,7 @@ Katkılarınızı bekliyoruz! Geliştirme süreci, PR beklentileri ve AI/LLM des
 - **Paneli iyileştirin** — Analiz sayfasına grafikler, anahtar döndürme deneyimi, `.env` üzerinden toplu anahtar aktarımı.
 - **Belgelere katkıda bulunun** — daha fazla örnek, Go/Rust gibi diller için istemci kodları, Docker veya Fly için dağıtım tarifleri.
 
-`npm install && npm run dev`, sunucuyu :3001 ve paneli :5173 üzerinde HMR desteğiyle başlatır. Tekrarlanabilir kurulum için Bash’te `./scripts/dev-bootstrap.sh`, PowerShell’de `.\scripts\dev-bootstrap.ps1` kullanın; ikisi de mevcut `.env` dosyasını korur. PR’lar test içermeli, mevcut testlerin geçmesini sağlamalı (`npm test`) ve depodaki `.editorconfig` / tsconfig varsayılanlarına uymalıdır. Veritabanı geçiş iş akışı ve tüm katkı süreci [CONTRIBUTING.md](./CONTRIBUTING.md) dosyasındadır.
+`npm install && npm run dev`, sunucuyu :4301 ve paneli :5173 üzerinde HMR desteğiyle başlatır. Tekrarlanabilir kurulum için Bash’te `./scripts/dev-bootstrap.sh`, PowerShell’de `.\scripts\dev-bootstrap.ps1` kullanın; ikisi de mevcut `.env` dosyasını korur. PR’lar test içermeli, mevcut testlerin geçmesini sağlamalı (`npm test`) ve depodaki `.editorconfig` / tsconfig varsayılanlarına uymalıdır. Veritabanı geçiş iş akışı ve tüm katkı süreci [CONTRIBUTING.md](./CONTRIBUTING.md) dosyasındadır.
 
 ### Katkıda bulunanlar
 

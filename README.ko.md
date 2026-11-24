@@ -132,7 +132,7 @@ FreeLLMAPI는 여러 제공자의 무료 플랜을 하나의 `/v1` API로 묶습
 대부분의 에이전트는 명령 한 줄로 설정할 수 있습니다. 설정 명령은 현재 카탈로그를 읽고, 기존 설정 파일을 백업한 뒤 필요한 내용을 추가합니다.
 
 ```bash
-npx freellmapi setup-claude --url http://localhost:3001 --api-key <unified-key>
+npx freellmapi setup-claude --url http://localhost:4301 --api-key <unified-key>
 ```
 
 **[지원 에이전트 전체 목록과 설정 명령](docs/en/clients/02-supported-agents.md)** · [도구별 설정, MCP 서버, URL 토큰](docs/en/clients/01-agent-clients.md)
@@ -183,7 +183,7 @@ curl -fsSL https://freellmapi.co/install.sh | bash
 
 실행 전에 내용을 확인하려면 설치 스크립트를 먼저 열어 보세요. 다시 실행해도 `.env`와 암호화 키는 그대로 두고 컨테이너만 `:latest`로 갱신합니다. [설치 스크립트](https://freellmapi.co/install.sh)
 
-<http://localhost:3001>에 접속해 **열쇠(Keys)** 페이지에 제공자 키를 추가하세요. **폴백 체인**에서 모델 순서를 바꿀 수 있습니다. OpenAI SDK에는 **열쇠** 페이지 상단의 통합 API 키를 복사해 넣으세요.
+<http://localhost:4301>에 접속해 **열쇠(Keys)** 페이지에 제공자 키를 추가하세요. **폴백 체인**에서 모델 순서를 바꿀 수 있습니다. OpenAI SDK에는 **열쇠** 페이지 상단의 통합 API 키를 복사해 넣으세요.
 
 Windows에서는 Microsoft Store 앱으로 시작하는 게 가장 쉽습니다. 서명된 앱이라 Smart App Control에 막히지 않고 자동으로 업데이트됩니다. GitHub Releases에 있는 `.exe`는 같은 앱의 서명 없는 설치 파일입니다. Android에서는 실험 단계인 Termux 설치를 써 볼 수 있습니다. **[Microsoft Store](https://apps.microsoft.com/detail/9PBN6G8K2B7F)** · [GitHub Releases](https://github.com/tashfeenahmed/freellmapi/releases/latest) · [Termux 설치 안내](docs/en/install/02-android-termux.md)
 
@@ -205,7 +205,7 @@ macOS 12 Monterey 이상에서는 **arm64(Apple Silicon)**와 **x64(Intel)** 중
 
 ## OpenAI 호환 클라이언트 연결
 
-OpenAI 호환 기본 URL을 지정할 수 있는 클라이언트라면 `http://localhost:3001/v1`과 대시보드의 통합 API 키로 연결할 수 있습니다. 설정을 생성하는 모든 명령은 `--dry-run`을 지원합니다. `npx freellmapi launch`(Claude Code)와 `launch-codex`(Codex)를 쓰면 설정 파일에 인증 정보를 남기지 않습니다. 라우터는 MCP 서버로도 동작해, 에이전트가 작업 중에 모델 목록과 라우팅 정보를 조회할 수 있습니다.
+OpenAI 호환 기본 URL을 지정할 수 있는 클라이언트라면 `http://localhost:4301/v1`과 대시보드의 통합 API 키로 연결할 수 있습니다. 설정을 생성하는 모든 명령은 `--dry-run`을 지원합니다. `npx freellmapi launch`(Claude Code)와 `launch-codex`(Codex)를 쓰면 설정 파일에 인증 정보를 남기지 않습니다. 라우터는 MCP 서버로도 동작해, 에이전트가 작업 중에 모델 목록과 라우팅 정보를 조회할 수 있습니다.
 
 **ChatGPT**는 비공개 Secure MCP Tunnel로 같은 로컬 라우터에 연결합니다. MCP 도구 `ask_freellmapi`는 ChatGPT의 요청을 `/v1/chat/completions`로 보내고, 답변과 함께 실제 사용한 모델, 폴백, 캐시, 실행, 토큰 정보를 돌려줍니다. 기본 URL과 Bearer 인증은 터널 클라이언트에서 설정합니다. 기본 모델은 `MCP_INFERENCE_DEFAULT_MODEL`로 지정하며, 값을 비워 두면 `auto`를 씁니다. Git 저장소나 MCP URL에 키를 넣지 마세요. **[ChatGPT 연결 방법](docs/en/clients/01-agent-clients.md#chatgpt-private-secure-mcp-tunnel)**
 
@@ -256,7 +256,7 @@ FreeLLMAPI는 한 사람이 자기 기기에서 쓰는 것을 전제로 설계�
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="http://localhost:3001/v1",
+    base_url="http://localhost:4301/v1",
     api_key="freellmapi-your-unified-key",
 )
 
@@ -341,7 +341,7 @@ API 문서에는 스트리밍, `auto:*` 라우팅 전략, 도구 호출, 이미�
 - **대시보드 개선.** 분석 페이지 차트, 키 교체 흐름, `.env`에서 키를 일괄로 가져오는 기능 등을 다듬을 수 있습니다.
 - **문서 보강.** 사용 예제, Go나 Rust 클라이언트 코드, Docker나 Fly 배포 안내 등을 추가해 주세요.
 
-`npm install && npm run dev`를 실행하면 서버는 3001번 포트, 대시보드는 5173번 포트에서 뜨며 둘 다 HMR을 지원합니다. 환경을 같은 방식으로 다시 구성하려면 Bash에서 `./scripts/dev-bootstrap.sh`, PowerShell에서 `.\scripts\dev-bootstrap.ps1`을 실행하세요. 두 스크립트 모두 기존 `.env`를 유지합니다. PR에는 테스트를 포함하고, 기존 테스트가 `npm test`에서 모두 통과하는지 확인하고, 저장소의 `.editorconfig`와 tsconfig 기본 설정을 따르세요. DB 마이그레이션 절차와 전체 작업 흐름은 기여 가이드에 있습니다. [기여 가이드](./CONTRIBUTING.md)
+`npm install && npm run dev`를 실행하면 서버는 4301번 포트, 대시보드는 5173번 포트에서 뜨며 둘 다 HMR을 지원합니다. 환경을 같은 방식으로 다시 구성하려면 Bash에서 `./scripts/dev-bootstrap.sh`, PowerShell에서 `.\scripts\dev-bootstrap.ps1`을 실행하세요. 두 스크립트 모두 기존 `.env`를 유지합니다. PR에는 테스트를 포함하고, 기존 테스트가 `npm test`에서 모두 통과하는지 확인하고, 저장소의 `.editorconfig`와 tsconfig 기본 설정을 따르세요. DB 마이그레이션 절차와 전체 작업 흐름은 기여 가이드에 있습니다. [기여 가이드](./CONTRIBUTING.md)
 
 ### 기여자
 

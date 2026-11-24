@@ -194,7 +194,7 @@ describe('Keys API', () => {
     }
   });
 
-  it('#1327: a Premium install is not told to add a Premium license key', async () => {
+  it('live catalog keys are told to sync the catalog when no models exist', async () => {
     const db = getDb();
     db.prepare("UPDATE models SET enabled = 0 WHERE platform = 'agnes'").run();
     db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('catalog_applied_tier', 'live')").run();
@@ -203,8 +203,8 @@ describe('Keys API', () => {
         platform: 'agnes',
         key: 'agnes_test_key_123456',
       });
-      expect(body.notice).toMatch(/Premium catalog does not list any agnes models/);
-      expect(body.notice).not.toMatch(/Add a Premium license key/);
+      expect(body.notice).toMatch(/catalog does not list any agnes models/);
+      expect(body.notice).toMatch(/POST \/api\/catalog\/sync/);
       expect(body.notice).toMatch(/base URL https:\/\/apihub\.agnes-ai\.com\/v1/);
     } finally {
       db.prepare("DELETE FROM settings WHERE key = 'catalog_applied_tier'").run();

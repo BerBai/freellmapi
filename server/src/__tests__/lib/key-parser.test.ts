@@ -83,7 +83,7 @@ describe('key parser', () => {
   });
 
   it('parses flat JSON string values', () => {
-    expect(parseJson(JSON.stringify({ MISTRAL_API_KEY: 'mist-test', PORT: 3001 }))).toEqual([
+    expect(parseJson(JSON.stringify({ MISTRAL_API_KEY: 'mist-test', PORT: 4301 }))).toEqual([
       { key: 'MISTRAL_API_KEY', value: 'mist-test' },
     ]);
   });
@@ -182,7 +182,7 @@ describe('key parser', () => {
   });
 
   it('keeps unknown but key-like values for preview', () => {
-    const result = parseKeysFromFile('ANTHROPIC_API_KEY=sk-ant-test-value\nPORT=3001', 'keys.env');
+    const result = parseKeysFromFile('ANTHROPIC_API_KEY=sk-ant-test-value\nPORT=4301', 'keys.env');
     expect(result.keys).toEqual([
       { rawKey: 'ANTHROPIC_API_KEY=sk-ant-test-value', prefix: 'ANTHROPIC_', platform: null },
     ]);

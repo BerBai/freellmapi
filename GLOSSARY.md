@@ -86,7 +86,7 @@ dive wins; fix this file.
 
 ## Repo map
 
-- `server/` — Express proxy (`:3001`), router, quota, providers, DB.
+- `server/` — Express proxy (`:4301`), router, quota, providers, DB.
 - `client/` — React + Vite dashboard.
 - `shared/` — `types.ts`, notably the `Platform` union.
 - `cli/`, `desktop/` — CLIs and desktop shell, not the hot path.

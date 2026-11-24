@@ -11,7 +11,7 @@ describe('CLI arguments and launchers', () => {
     const previous = process.env.FREELLMAPI_URL;
     delete process.env.FREELLMAPI_URL;
     try {
-      expect(parseArgs(['setup-generic']).options.url).toBe('http://localhost:3001');
+      expect(parseArgs(['setup-generic']).options.url).toBe('http://localhost:4301');
     } finally {
       if (previous === undefined) delete process.env.FREELLMAPI_URL;
       else process.env.FREELLMAPI_URL = previous;
@@ -21,14 +21,14 @@ describe('CLI arguments and launchers', () => {
   it('parses setup options before or after the command', () => {
     expect(parseArgs([
       '--url',
-      'http://localhost:3001/v1',
+      'http://localhost:4301/v1',
       'setup-codex',
       '--profile=work',
       '--dry-run',
     ])).toMatchObject({
       command: 'setup-codex',
       options: {
-        url: 'http://localhost:3001/v1',
+        url: 'http://localhost:4301/v1',
         profile: 'work',
         dryRun: true,
       },
@@ -106,7 +106,7 @@ describe('CLI arguments and launchers', () => {
     try {
       for (const [command, agent] of [['launch-codex', 'codex'], ['launch', 'claude']]) {
         fs.rmSync(marker, { force: true });
-        expect(await main([command, '--url', 'http://127.0.0.1:3001', '--api-key', 'test-key']))
+        expect(await main([command, '--url', 'http://127.0.0.1:4301', '--api-key', 'test-key']))
           .toBe(17);
         expect(fs.readFileSync(marker, 'utf8').trim()).toBe(agent);
       }
@@ -238,12 +238,12 @@ describe('CLI arguments and launchers', () => {
   });
 
   it('passes a complete Responses provider to Codex', () => {
-    const args = codexArgs('http://localhost:3001/v1/', 'coder');
+    const args = codexArgs('http://localhost:4301/v1/', 'coder');
     expect(args).toContain('model_provider="freellmapi"');
     expect(args).toContain('model="coder"');
     expect(args).toContain('model_providers.freellmapi.name="FreeLLMAPI"');
     expect(args).toContain(
-      'model_providers.freellmapi.base_url="http://localhost:3001/v1"',
+      'model_providers.freellmapi.base_url="http://localhost:4301/v1"',
     );
     expect(args).toContain('model_providers.freellmapi.wire_api="responses"');
   });

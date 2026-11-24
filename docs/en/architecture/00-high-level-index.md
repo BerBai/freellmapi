@@ -21,7 +21,7 @@ See [OVERVIEW.md](OVERVIEW.md) for deep-dives.
 
 ```
 ┌──────────────────┐   Bearer freellmapi-…   ┌─────────────────────────┐
-│  OpenAI SDK /    │ ──────────────────────▶ │  Express proxy (:3001)  │
+│  OpenAI SDK /    │ ──────────────────────▶ │  Express proxy (:4301)  │
 │  curl / any      │ ◀────────────────────── │  /v1/chat/completions   │
 │  OpenAI client   │      streamed tokens    └────────────┬────────────┘
 └──────────────────┘                                      │

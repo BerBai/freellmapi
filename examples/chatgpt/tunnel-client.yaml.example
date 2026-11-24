@@ -10,7 +10,7 @@ control_plane:
 mcp:
   server_urls:
     - channel: main
-      url: http://127.0.0.1:3001/mcp
+      url: http://127.0.0.1:4301/mcp
   # Set FREELLMAPI_MCP_AUTHORIZATION to the complete value
   # "Bearer freellmapi-..." in the process environment.
   extra_headers:

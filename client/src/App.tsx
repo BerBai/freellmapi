@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, NavLink, Link, useLocation, useNavigate } from 'react-router-dom'
 import { MutationCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ChevronDown, KeyRound, LogOut, Menu, MoreHorizontal, RefreshCw, Search, Settings, Sparkles } from 'lucide-react'
+import { ChevronDown, KeyRound, LogOut, Menu, MoreHorizontal, RefreshCw, Search, Settings } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -24,7 +24,6 @@ import { OPEN_UPDATES_EVENT } from '@/lib/updates'
 import { Toaster } from '@/components/toaster'
 import { UpdateReminder } from '@/components/update-reminder'
 import { NewBuildPrompt } from '@/components/new-build-prompt'
-import { usePremium } from '@/hooks/use-premium'
 import { I18nProvider, useI18n } from '@/i18n'
 import { logout } from '@/lib/api'
 import { toast } from '@/lib/toast'
@@ -44,7 +43,6 @@ import MediaDetailPage from '@/pages/MediaDetailPage'
 import EmbeddingDetailPage from '@/pages/EmbeddingDetailPage'
 import AnalyticsPage from '@/pages/AnalyticsPage'
 import LogsPage from '@/pages/LogsPage'
-import PremiumPage from '@/pages/PremiumPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 import AgentsPage from '@/pages/AgentsPage'
 
@@ -75,7 +73,6 @@ const navItems = [
   { to: '/keys', labelKey: 'nav.keys' },
   { to: '/agents', labelKey: 'nav.agents' },
   { to: '/analytics', labelKey: 'nav.analytics' },
-  { to: '/premium', labelKey: 'nav.premium' },
 ]
 
 // The modality pages behind "Models"; surfaced in the nav dropdown and
@@ -173,27 +170,21 @@ if (isDesktopApp) {
 }
 
 function AccountMenuItems({
-  showUpgrade,
-  upgradeLabel,
   settingsLabel,
   updatesLabel,
   signOutLabel,
   changeEmailLabel,
   changePasswordLabel,
-  onUpgrade,
   onOpenSettings,
   onOpenUpdates,
   onChangeEmail,
   onChangePassword,
 }: {
-  showUpgrade: boolean
-  upgradeLabel: string
   settingsLabel: string
   updatesLabel: string
   signOutLabel: string
   changeEmailLabel: string
   changePasswordLabel: string
-  onUpgrade: () => void
   onOpenSettings: () => void
   onOpenUpdates: () => void
   onChangeEmail: () => void
@@ -201,12 +192,6 @@ function AccountMenuItems({
 }) {
   return (
     <>
-      {showUpgrade && (
-        <DropdownMenuItem onClick={onUpgrade}>
-          <Sparkles />
-          {upgradeLabel}
-        </DropdownMenuItem>
-      )}
       <DropdownMenuItem onClick={onOpenSettings}>
         <Settings />
         {settingsLabel}
@@ -251,8 +236,6 @@ function Navbar() {
     return () => window.removeEventListener(OPEN_UPDATES_EVENT, open)
   }, [])
   const [credentialsMode, setCredentialsMode] = useState<'password' | 'email' | null>(null)
-  const { data: premium, licensed, isLoading: premiumLoading, isError: premiumError } = usePremium()
-  const showUpgrade = Boolean(premium) && !licensed && !premiumLoading && !premiumError
 
   return (
     <>
@@ -326,14 +309,11 @@ function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <AccountMenuItems
-                  showUpgrade={showUpgrade}
-                  upgradeLabel={t('nav.upgrade')}
                   settingsLabel={t('nav.settings')}
                   updatesLabel={t('settings.checkForUpdates')}
                   signOutLabel={t('nav.signOut')}
                   changeEmailLabel={t('auth.changeEmail')}
                   changePasswordLabel={t('auth.changePassword')}
-                  onUpgrade={() => navigate('/premium')}
                   onOpenSettings={() => setSettingsOpen(true)}
                   onOpenUpdates={() => setUpdatesOpen(true)}
                   onChangeEmail={() => setCredentialsMode('email')}
@@ -382,14 +362,11 @@ function Navbar() {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <AccountMenuItems
-                  showUpgrade={showUpgrade}
-                  upgradeLabel={t('nav.upgrade')}
                   settingsLabel={t('nav.settings')}
                   updatesLabel={t('settings.checkForUpdates')}
                   signOutLabel={t('nav.signOut')}
                   changeEmailLabel={t('auth.changeEmail')}
                   changePasswordLabel={t('auth.changePassword')}
-                  onUpgrade={() => navigate('/premium')}
                   onOpenSettings={() => setSettingsOpen(true)}
                   onOpenUpdates={() => setUpdatesOpen(true)}
                   onChangeEmail={() => setCredentialsMode('email')}
@@ -433,7 +410,7 @@ const FULL_BLEED_ROUTES = new Set(['/playground'])
 // as the widest thing that has finished rendering. On a page that fills in from
 // several independent queries — Analytics fires ten — that turns every arriving
 // response into a visible horizontal jump as the column re-fits, and pages
-// whose content never reaches 72rem (Analytics, Premium) settle narrower than
+// whose content never reaches 72rem (Analytics) settle narrower than
 // they were designed to be. A definite width makes the column 72rem from the
 // first paint, and `mx-auto` goes back to only centring it.
 function PageContainer({ children }: { children: ReactNode }) {
@@ -499,7 +476,6 @@ function App() {
                       <Route path="/fallback" element={<Navigate to="/models/chat" replace />} />
                       <Route path="/analytics" element={<AnalyticsPage />} />
                       <Route path="/logs" element={<LogsPage />} />
-                      <Route path="/premium" element={<PremiumPage />} />
                       <Route path="/test" element={<Navigate to="/playground" replace />} />
                       <Route path="/health" element={<Navigate to="/keys" replace />} />
                       <Route path="*" element={<NotFoundPage />} />

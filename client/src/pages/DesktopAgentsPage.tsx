@@ -114,7 +114,7 @@ function AgentCard({ tool, bridge, state, update, active, activate, seen }: {
         {seen && <p>{t('agents.seenRecently')}</p>}
         {(id === 'claude' || id === 'codex') && <p>{t(id === 'claude' ? 'search.agentsBadgeClaude' : 'search.agentsBadgeCodex')}</p>}
         <Files files={paths ?? []} />
-        <code className="value">npx freellmapi {tool.command} --url {origin}</code>
+        <code className="value">npx llmself {tool.command} --url {origin}</code>
         {saved && <button className="subbutton" disabled={busy} onClick={connect}>{t('common.apply')}</button>} {docs}
       </>}
       {panel === 'quit' && <p>{t('agents.connect.quit')}</p>}

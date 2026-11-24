@@ -18,7 +18,7 @@ The production image, the Compose quickstart, and everything about running FreeL
 FreeLLMAPI publishes a single production image containing the Express server and the built React dashboard:
 
 ```bash
-docker pull ghcr.io/tashfeenahmed/freellmapi:latest   # or pin a release, e.g. :v1.2.3
+docker pull ghcr.io/berbai/llmself:latest   # or pin a release, e.g. :v1.2.3
 ```
 
 Published tags: `latest` (default branch), `v*.*.*` (git release tags), and `sha-<commit>`. The image is multi-arch (`linux/amd64` + `linux/arm64`, so it runs on a Raspberry Pi).
@@ -26,7 +26,7 @@ Published tags: `latest` (default branch), `v*.*.*` (git release tags), and `sha
 Build shape ([Dockerfile](../../../Dockerfile)):
 
 - Three stages on the `node:24-bookworm-slim` base (`deps` → `build` → `runtime`); only already-built artifacts are copied into the runtime stage.
-- The runtime sets `NODE_ENV=production`, `PORT=3001`, and `FREELLMAPI_INSTALL_METHOD=docker`; the process is `node server/dist/index.js`.
+- The runtime sets `NODE_ENV=production`, `PORT=4301`, and `FREELLMAPI_INSTALL_METHOD=docker`; the process is `node server/dist/index.js`.
 - A `FREELLMAPI_COMMIT_SHA` ARG/ENV pair sits deliberately after all `COPY` layers: the SHA changes every commit, and placing it higher would invalidate the layer cache for the whole image on each build.
 - The runtime also copies `desktop/package.json` (a 400-byte manifest) so a container install can name its own release version (#703).
 - `.dockerignore` keeps secrets and local state out of the build context: `.env`, `.env.*`, `*.db` (+ `-wal`/`-shm` sidecars), `.encryption-key`, and `server/data` never enter an image.
@@ -41,7 +41,7 @@ cd freellmapi
 
 # Generate an encryption key for at-rest key storage
 ENCRYPTION_KEY="$(openssl rand -hex 32)"
-printf "ENCRYPTION_KEY=%s\nPORT=3001\n" "$ENCRYPTION_KEY" > .env
+printf "ENCRYPTION_KEY=%s\nPORT=4301\n" "$ENCRYPTION_KEY" > .env
 
 docker compose up -d
 ```
@@ -52,11 +52,11 @@ Windows PowerShell variant and a curl one-liner bootstrap live in [docs/en/insta
 docker compose logs -f freellmapi
 ```
 
-Open http://localhost:3001, add provider keys on the **Keys** page, and grab your unified API key from that page's header — that key is what your OpenAI SDK points at.
+Open http://localhost:4301, add provider keys on the **Keys** page, and grab your unified API key from that page's header — that key is what your OpenAI SDK points at.
 
 ## Ports & LAN access
 
-The compose file publishes `"${HOST_BIND:-127.0.0.1}:${PORT:-3001}:3001"`. By default the dashboard/API is reachable only from the machine running Docker; to reach it from other devices (e.g. a Raspberry Pi at `http://192.168.1.x:3001`):
+The compose file publishes `"${HOST_BIND:-127.0.0.1}:${PORT:-4301}:4301"`. By default the dashboard/API is reachable only from the machine running Docker; to reach it from other devices (e.g. a Raspberry Pi at `http://192.168.1.x:4301`):
 
 ```bash
 HOST_BIND=0.0.0.0 docker compose up -d
@@ -85,7 +85,7 @@ Both the Dockerfile and the compose file define the same probe: a Node one-liner
 
 ## Non-root runtime
 
-The runtime stage switches to `USER node` before `EXPOSE 3001`. The server data directory `/app/server/data` is created and chowned to `node:node` during the build so the running user owns it; all copied artifacts carry `--chown=node:node`.
+The runtime stage switches to `USER node` before `EXPOSE 4301`. The server data directory `/app/server/data` is created and chowned to `node:node` during the build so the running user owns it; all copied artifacts carry `--chown=node:node`.
 
 ## Why better-sqlite3 is compiled from source
 
